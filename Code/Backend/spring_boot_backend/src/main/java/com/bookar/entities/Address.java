@@ -43,6 +43,6 @@ public class Address {
 	@Column(length=20)
 	private String district;
 	
-	@Column(name="pincode")
-	private int pincode;
+	@Column(name="pincode", length=20)
+	private String pincode;
 }

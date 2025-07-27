@@ -1,5 +1,17 @@
 package com.bookar.service;
 
-public interface CustomerService {
+import com.bookar.dto.UserApiResponse;
+import com.bookar.dto.SignInDTO;
+import com.bookar.dto.UserAddressDTO;
+import com.bookar.dto.UserRequestDTO;
+import com.bookar.dto.UserResponseDTO;
+import com.bookar.entities.User;
 
+public interface CustomerService {
+	UserResponseDTO signUp(UserRequestDTO newUser);
+	UserResponseDTO getCompleteDetails(String Email);
+	UserResponseDTO signIn(SignInDTO details);
+	User updateDetails(User user);
+	UserResponseDTO getDetailsById(Long id);
+	
 }
