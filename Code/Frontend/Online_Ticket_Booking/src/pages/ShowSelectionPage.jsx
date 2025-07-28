@@ -66,7 +66,6 @@ const ShowSelectionPage = () => {
       </Container>
     )
   }
-
   return (
     <Container className="py-4">
       <Row className="mb-4">
@@ -77,18 +76,19 @@ const ShowSelectionPage = () => {
               alt={movie.title}
               style={{ width: "60px", height: "80px", objectFit: "cover" }}
               className="rounded me-3"
-            />
-           <div>
+            />  
+            <div>
               <h2 className="mb-1">{movie.title}</h2>
               <p className="text-muted mb-0">
                 {(Array.isArray(movie.genres) ? movie.genres.join(", ") : movie.genres)} • {movie.duration}
               </p>
             </div>
-          </div>
+          </div>  
+
         </Col>
       </Row>
 
-      <Row className="mb-4">
+      <Row className="mb-3">
         <Col md={6} className="mb-3">
           <Form.Group>
             <Form.Label className="d-flex align-items-center">
