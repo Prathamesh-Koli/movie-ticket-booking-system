@@ -3,7 +3,7 @@ package com.bookar.service;
 import com.razorpay.RazorpayException;
 
 import java.util.Map;
-
+import com.bookar.dto.*;
 public interface PaymentService {
-    Map<String, Object> createOrder(int amount) throws RazorpayException;
+    PaymentResponseDTO createOrder(PaymentRequestDTO dto) throws RazorpayException;
 }

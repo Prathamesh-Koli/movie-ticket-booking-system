@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import com.bookar.dto.*;
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
@@ -20,22 +20,22 @@ public class PaymentServiceImpl implements PaymentService {
     private String keySecret;
 
     @Override
-    public Map<String, Object> createOrder(int amount) throws RazorpayException {
+    public PaymentResponseDTO createOrder(PaymentRequestDTO dto) throws RazorpayException {
         RazorpayClient client = new RazorpayClient(keyId, keySecret);
 
         JSONObject options = new JSONObject();
-        options.put("amount", amount * 100); // paise
+        options.put("amount", dto.getAmount() * 100);
         options.put("currency", "INR");
         options.put("receipt", "order_rcptid_" + System.currentTimeMillis());
 
         Order order = client.orders.create(options);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("orderId", order.get("id"));
-        response.put("amount", order.get("amount"));
-        response.put("currency", order.get("currency"));
-        response.put("key", keyId);
-
-        return response;
+        return new PaymentResponseDTO(
+            order.get("id"),
+            order.get("amount"),
+            order.get("currency"),
+            keyId
+        );
     }
+
 }
