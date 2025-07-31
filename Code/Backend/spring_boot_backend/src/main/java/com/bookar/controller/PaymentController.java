@@ -17,9 +17,7 @@ public class PaymentController {
     @PostMapping("/create-order")
     public ResponseEntity<PaymentResponseDTO> createOrder(@RequestBody PaymentRequestDTO dto) throws RazorpayException {
         PaymentResponseDTO response = paymentService.createOrder(dto);
-        System.out.println("response:"+ response);
-        System.out.println("Sending session token: " + response.getKey() );
-
+        
         return ResponseEntity.ok(response);
     }
 
