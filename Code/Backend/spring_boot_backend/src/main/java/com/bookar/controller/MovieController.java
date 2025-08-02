@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bookar.dto.MovieDetailDTO;
 import com.bookar.dto.MovieResponseDTO;
 import com.bookar.service.MovieService;
 
@@ -31,5 +32,12 @@ public class MovieController {
         List<String> locations = movieService.getLocationsForMovie(movieId);
         return ResponseEntity.ok(locations);
     }
+	
+	@GetMapping("/details/{id}")
+	public ResponseEntity<MovieDetailDTO> getMovieDetailsById(@PathVariable Long id) {
+		MovieDetailDTO dto = movieService.getMovieDetailsById(id);
+		return ResponseEntity.ok(dto);
+	}
+	
 
 }
