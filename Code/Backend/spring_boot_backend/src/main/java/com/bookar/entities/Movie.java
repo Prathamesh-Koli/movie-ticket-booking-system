@@ -32,10 +32,13 @@ public class Movie {
 	@Column(name = "language" , nullable =false)
     private String language;
 
-	@Enumerated(EnumType.STRING)
+	@ElementCollection(targetClass = Genre.class)
+	@CollectionTable( name = "movie_genres", joinColumns = @JoinColumn(name = "movie_id"))
 	@Column(name = "genre")
-	private Genre genre;
-
+	@Enumerated(EnumType.STRING)
+	private List<Genre> genres;
+	
+	
 	@Column(name = "duration", nullable = false)
 	private String duration;
 
@@ -45,6 +48,9 @@ public class Movie {
     @Column(name = "poster_url")
     private String posterUrl;
     
+    @Column(name="trailer_url")
+    private String trailerUrl;
+    
     @OneToMany(mappedBy = "movie")
     private List<Show> shows;
 
@@ -53,6 +59,20 @@ public class Movie {
 	@Column(name="created_at")
 	private LocalDate createdAt;
     
+
+    @Column(name = "rating")
+    private Double rating;
+
+    @ElementCollection
+    @CollectionTable(
+        name = "movie_cast",
+        joinColumns = @JoinColumn(name = "movie_id")
+    )
+    private List<MovieCast> cast;
+
+
+
+
     
 	
 }
