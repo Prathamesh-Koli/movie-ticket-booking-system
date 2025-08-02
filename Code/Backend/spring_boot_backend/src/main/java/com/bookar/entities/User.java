@@ -16,7 +16,7 @@ import lombok.ToString;
 @Setter
 @Getter
 @NoArgsConstructor
-@ToString(exclude = "Address")
+@ToString(exclude = "address")
 @EqualsAndHashCode
 public class User {
 	@Id
@@ -32,7 +32,7 @@ public class User {
 	@Column(length = 50, unique = true)
 	private String email;
 	
-	@Column(length = 20, nullable = false)
+	@Column(length = 100, nullable = false)
 	private String password;
 	
 	@Column(length = 10, unique = true, nullable = false)
