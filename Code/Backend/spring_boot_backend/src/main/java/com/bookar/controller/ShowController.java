@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.bookar.dto.ShowDetailsDTO;
 import com.bookar.dto.TheaterShowDTO;
 import com.bookar.service.ShowService;
 
@@ -29,5 +30,10 @@ public class ShowController {
     ) {
         List<TheaterShowDTO> result = showService.getTheatersWithShows(movieId, date, location);
         return ResponseEntity.ok(result);
+    }
+    
+    @GetMapping("/{showId}/details")
+    public ShowDetailsDTO getShowDetails(@PathVariable Long showId) {
+        return showService.getShowDetails(showId);
     }
 }
