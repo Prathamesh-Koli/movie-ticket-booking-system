@@ -1,5 +1,7 @@
 package com.bookar.dto;
 
+import java.util.List;
+
 import com.bookar.entities.Genre;
 
 import lombok.Getter;
@@ -11,7 +13,7 @@ public class MovieResponseDTO {
 	private Long movieId;
     private String title;
     private String posterUrl;
-    private Genre genre;
+    private List<Genre> genres;
     private String duration;
 
 }
