@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { Container, Row, Col, Card, Button, Form } from "react-bootstrap"
+import axios from 'axios';
 import { useParams, useNavigate } from "react-router-dom"
 import { MapPin, Calendar, Clock } from "lucide-react"
 
@@ -19,33 +20,35 @@ const ShowSelectionPage = () => {
     return date.toISOString().split("T")[0]
   })
 
-  // Fetch movie details
-  useEffect(() => {
-    fetch(`http://localhost:9090/movies/${id}`)
-      .then(res => res.json())
-      .then(setMovie)
-      .catch(console.error)
-  }, [id])
 
-  // Fetch locations for the movie
   useEffect(() => {
-    fetch(`http://localhost:9090/movies/${id}/locations`)
-      .then(res => res.json())
-      .then(data => {
-        setLocations(data)
-        setSelectedLocation(data[0] || "")
+    axios.get(`http://localhost:9090/movies/${id}`)
+      .then(response => setMovie(response.data))
+      .catch(console.error);
+  }, [id]);
+
+
+  useEffect(() => {
+    axios.get(`http://localhost:9090/movies/${id}/locations`)
+      .then(response => {
+        setLocations(response.data);
+        setSelectedLocation(response.data[0] || "");
       })
-      .catch(console.error)
-  }, [id])
+      .catch(console.error);
+  }, [id]);
 
-  // Fetch theaters with shows
+
   useEffect(() => {
-    if (!selectedLocation || !selectedDate) return
-    fetch(`http://localhost:9090/shows/movie/${id}?date=${selectedDate}&location=${selectedLocation}`)
-      .then(res => res.json())
-      .then(setTheaters)
-      .catch(console.error)
-  }, [id, selectedDate, selectedLocation])
+    if (!selectedLocation || !selectedDate) return;
+    axios.get(`http://localhost:9090/shows/movie/${id}`, {
+      params: {
+        date: selectedDate,
+        location: selectedLocation
+      }
+    })
+      .then(response => setTheaters(response.data))
+      .catch(console.error);
+  }, [id, selectedDate, selectedLocation]);
 
   const handleShowSelect = (theaterId, showId) => {
     navigate(`/movie/${id}/seats?theater=${theaterId}&show=${showId}`)
@@ -75,10 +78,10 @@ const ShowSelectionPage = () => {
               style={{ width: "60px", height: "80px", objectFit: "cover" }}
               className="rounded me-3"
             />
-            <div>
+           <div>
               <h2 className="mb-1">{movie.title}</h2>
               <p className="text-muted mb-0">
-                {(Array.isArray(movie.genre) ? movie.genre.join(", ") : movie.genre)} • {movie.duration}
+                {(Array.isArray(movie.genres) ? movie.genres.join(", ") : movie.genres)} • {movie.duration}
               </p>
             </div>
           </div>
