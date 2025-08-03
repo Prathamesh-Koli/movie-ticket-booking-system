@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.bookar.dto.ShowDetailsDTO;
 import com.bookar.entities.Show;
 
 public interface ShowDao extends JpaRepository<Show, Long> {
@@ -22,9 +23,17 @@ public interface ShowDao extends JpaRepository<Show, Long> {
 		      AND s.showDate = :date
 		      AND s.screen.theater.theaterLocation LIKE %:location%
 		""")
-		List<Show> findShowsByMovieDateLocation(
+	List<Show> findShowsByMovieDateLocation(
 		    @Param("movieId") Long movieId,
 		    @Param("date") LocalDate date,
 		    @Param("location") String location
-		);
+	);
+	
+	 @Query("SELECT new com.bookar.dto.ShowDetailsDTO( " +
+	           "t.theaterName, t.theaterAddress, s.screenNumber, sh.showDate, sh.startTime) " +
+	           "FROM Show sh " +
+	           "JOIN sh.screen s " +
+	           "JOIN s.theater t " +
+	           "WHERE sh.showId = :showId")
+	 ShowDetailsDTO getShowDetailsByShowId(@Param("showId") Long showId);
 }
