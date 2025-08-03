@@ -48,7 +48,7 @@ public class User {
 	@Column(length = 20, name="role")
 	private Role role;
 	
-	@OneToOne(cascade = CascadeType.ALL, fetch=FetchType.LAZY)
+	@OneToOne(cascade = CascadeType.ALL, fetch=FetchType.EAGER)
 	@JoinColumn(name = "address_id")
 	private Address address;
 	

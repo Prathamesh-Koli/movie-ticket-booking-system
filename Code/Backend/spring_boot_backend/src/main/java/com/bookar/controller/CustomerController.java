@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bookar.dto.SignInDTO;
 import com.bookar.dto.UserRequestDTO;
+import com.bookar.dto.updatePasswordDTO;
 import com.bookar.entities.User;
 import com.bookar.service.CustomerService;
 
@@ -35,7 +36,6 @@ public class CustomerController {
 	
 	@PostMapping("/signup")
 	public ResponseEntity<?> userSignUp(@Valid @RequestBody UserRequestDTO user) {
-		System.out.print(user);
 		return ResponseEntity.status(HttpStatus.CREATED).body(customerService.signUp(user));
 	}
 	
@@ -47,5 +47,10 @@ public class CustomerController {
 	@GetMapping("/details/{Id}")
 	public ResponseEntity<?> getDetailsById(@PathVariable Long Id){
 		return ResponseEntity.status(HttpStatus.OK).body(customerService.getDetailsById(Id));
+	}
+	
+	@PostMapping("/password")
+	public ResponseEntity<?> updatePassword(@RequestBody updatePasswordDTO newPass){
+		return ResponseEntity.status(HttpStatus.CREATED).body(customerService.updatePassword(newPass));
 	}
 }

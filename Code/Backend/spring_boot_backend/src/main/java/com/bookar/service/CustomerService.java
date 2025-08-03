@@ -5,6 +5,7 @@ import com.bookar.dto.SignInDTO;
 import com.bookar.dto.UserAddressDTO;
 import com.bookar.dto.UserRequestDTO;
 import com.bookar.dto.UserResponseDTO;
+import com.bookar.dto.updatePasswordDTO;
 import com.bookar.entities.User;
 
 public interface CustomerService {
@@ -13,5 +14,6 @@ public interface CustomerService {
 	UserResponseDTO signIn(SignInDTO details);
 	User updateDetails(User user);
 	UserResponseDTO getDetailsById(Long id);
+	UserApiResponse updatePassword(updatePasswordDTO newPass);  
 	
 }

@@ -1,7 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
+import { ToastContainer } from 'react-toastify';
 import ShowSelectionPage from "./pages/ShowSelectionPage"
 import { BookingProvider } from "./contexts/BookingContext"
 import SeatSelectionPage from "./pages/SeatSelectionPage"
+import Login from './pages/Login';
+import Register from './pages/Register';
+import UserProfilePage from "./pages/UserProfilePage";
 
 function App() {
   return (
@@ -11,16 +15,18 @@ function App() {
         {/* <Navbar /> */}
         <main className="main-content">
           <Routes>
-            <Route path="/movie/:id/shows" element={<ShowSelectionPage />}
-             />
             <Route path="/movie/:id/seats" element={<SeatSelectionPage />} />
+            <Route path="/movie/:id/shows" element={<ShowSelectionPage />} />
+            <Route path='signin' element={<Login/>}/>
+            <Route path='profile' element={<UserProfilePage/>}/>
+            <Route path="signup" element={<Register/>}/>
           </Routes>
         </main>
         {/* <Footer /> */}
+        <ToastContainer/>
       </div>
     </Router>
     </BookingProvider>
-    
   )
 }
 
