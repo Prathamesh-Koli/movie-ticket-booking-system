@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bookar.dao.MovieDao;
 import com.bookar.dao.ShowDao;
+import com.bookar.dto.ShowDetailsDTO;
 import com.bookar.dto.ShowTimeDTO;
 import com.bookar.dto.TheaterShowDTO;
 import com.bookar.entities.Show;
@@ -57,6 +58,11 @@ public class ShowServiceImpl implements ShowService {
 
         return result;
     }
+
+	@Override
+	public ShowDetailsDTO getShowDetails(Long showId) {
+		return showDao.getShowDetailsByShowId(showId);
+	}
 
 	
 }

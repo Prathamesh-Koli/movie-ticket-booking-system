@@ -39,7 +39,7 @@ public class MovieServiceImpl implements MovieService {
         Movie movie = movieDao.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Movie not found with id: " + id));
 
-        // ✅ Map MovieCast to MovieCastDTO explicitly
+       
         modelMapper.typeMap(MovieCast.class, MovieCastDTO.class);
 
         return modelMapper.map(movie, MovieDetailDTO.class);
