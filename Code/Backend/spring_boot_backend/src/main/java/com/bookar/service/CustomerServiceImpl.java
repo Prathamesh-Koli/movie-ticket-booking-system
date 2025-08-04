@@ -1,8 +1,5 @@
 package com.bookar.service;
 
-import java.util.Optional;
-
-import org.hibernate.type.internal.UserTypeSqlTypeAdapter;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -11,14 +8,11 @@ import com.bookar.custom_exceptions.ApiException;
 import com.bookar.custom_exceptions.InvalidCredentialsException;
 import com.bookar.custom_exceptions.ResourceNotFoundException;
 import com.bookar.dao.CustomerDao;
-import com.bookar.dto.UserApiResponse;
 import com.bookar.dto.SignInDTO;
-import com.bookar.dto.UserAddressDTO;
 import com.bookar.dto.UserRequestDTO;
 import com.bookar.dto.UserResponseDTO;
 import com.bookar.dto.updatePasswordDTO;
 import com.bookar.entities.User;
-import com.bookar.security.SecurityConfig;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;

@@ -1,5 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
-import { ToastContainer } from 'react-toastify';
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
 import ShowSelectionPage from "./pages/ShowSelectionPage"
 import { BookingProvider } from "./contexts/BookingContext"
 import SeatSelectionPage from "./pages/SeatSelectionPage"
@@ -12,18 +11,16 @@ function App() {
     <BookingProvider>
       <Router>
       <div className="app">
-        {/* <Navbar /> */}
         <main className="main-content">
           <Routes>
-            <Route path="/movie/:id/seats" element={<SeatSelectionPage />} />
+            <Route path="/" element={<Navigate to="/movie/1/shows" />} />
+            
             <Route path="/movie/:id/shows" element={<ShowSelectionPage />} />
             <Route path='signin' element={<Login/>}/>
             <Route path='profile' element={<UserProfilePage/>}/>
             <Route path="signup" element={<Register/>}/>
           </Routes>
         </main>
-        {/* <Footer /> */}
-        <ToastContainer/>
       </div>
     </Router>
     </BookingProvider>

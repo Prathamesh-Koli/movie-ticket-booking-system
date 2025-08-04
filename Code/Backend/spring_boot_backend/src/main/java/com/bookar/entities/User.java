@@ -3,7 +3,6 @@ package com.bookar.entities;
 import java.time.LocalDate;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.context.annotation.Fallback;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
