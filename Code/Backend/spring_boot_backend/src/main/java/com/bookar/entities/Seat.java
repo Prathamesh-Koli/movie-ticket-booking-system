@@ -1,5 +1,4 @@
 package com.bookar.entities;
-
 import java.time.LocalDate;
 import java.util.List;
 
