@@ -2,10 +2,7 @@ import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { Container, Card, Button, Spinner, Alert, Row, Col } from "react-bootstrap"
 import axios from "axios"
-<<<<<<< HEAD
 import '../styles/TicketPage.css'
-=======
->>>>>>> d1bc5bc36f511c3e2641c2081d7ae10454cc0ace
 
 const TicketPage = () => {
   const { bookingId } = useParams()
@@ -62,61 +59,6 @@ const TicketPage = () => {
     <Container className="py-4">
       <Row className="justify-content-center">
         <Col md={8}>
-<<<<<<< HEAD
-<Card className="ticket-card"
-  style={{ backgroundColor: '#afada7ff' }} //f1c166ff
->
-  <Card.Header className="text-center">
-    <h4>BooKar</h4>
-  </Card.Header>
-
-  <div className="perforated-line"></div>
-
-  <Card.Body className="ticket-body-centered">
-    <div className="ticket-row">
-      <span className="ticket-label">Booking ID:</span>
-      <span className="ticket-value">{ticket.id}</span>
-    </div>
-    <div className="ticket-row">
-      <span className="ticket-label">Payment ID:</span>
-      <span className="ticket-value">{ticket.paymentId}</span>
-    </div>
-    <div className="ticket-row">
-      <span className="ticket-label">User Name:</span>
-      <span className="ticket-value">{ticket.username}</span>
-    </div>
-    <div className="ticket-row">
-      <span className="ticket-label">Movie Name:</span>
-      <span className="ticket-value">{ticket.movieName}</span>
-    </div>
-    <div className="ticket-row">
-      <span className="ticket-label">Theatre Name:</span>
-      <span className="ticket-value">{ticket.theatreName}</span>
-    </div>
-    <div className="ticket-row">
-      <span className="ticket-label">Show Date:</span>
-      <span className="ticket-value">{ticket.movieDate}</span>
-    </div>
-    <div className="ticket-row">
-      <span className="ticket-label">Show Time:</span>
-      <span className="ticket-value">{ticket.showTime}</span>
-    </div>
-    <div className="ticket-row">
-      <span className="ticket-label">Seat Numbers:</span>
-      <span className="ticket-value">{ticket.seatNumbers?.join(", ")}</span>
-    </div>
-  </Card.Body>
-</Card>
-
-<div className="button-container">
-  <Button variant="primary" onClick={() => navigate("/")}>
-    Book Another Ticket
-  </Button>
-</div>
-
-
-
-=======
           <Card className="shadow">
             <Card.Header className="text-center">
               <h4>Your Movie Ticket</h4>
@@ -131,7 +73,6 @@ const TicketPage = () => {
               <Button variant="primary" onClick={() => navigate("/")}>Book Another Ticket</Button>
             </Card.Body>
           </Card>
->>>>>>> d1bc5bc36f511c3e2641c2081d7ae10454cc0ace
         </Col>
       </Row>
     </Container>
