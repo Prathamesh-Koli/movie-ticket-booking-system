@@ -32,7 +32,7 @@ public class Movie {
 	@Column(name = "language" , nullable =false)
     private String language;
 
-	@ElementCollection(targetClass = Genre.class)
+	@ElementCollection(targetClass = Genre.class, fetch = FetchType.EAGER)
 	@CollectionTable( name = "movie_genres", joinColumns = @JoinColumn(name = "movie_id"))
 	@Column(name = "genre")
 	@Enumerated(EnumType.STRING)
@@ -70,7 +70,9 @@ public class Movie {
     )
     private List<MovieCast> cast;
 
-
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MovieStatus status;
 
 
     
