@@ -1,6 +1,7 @@
 "use client"
 
-import { createContext, useContext, useState } from "react"
+import { createContext, useContext, useState, useEffect } from "react"
+import axios from "axios"
 
 const BookingContext = createContext()
 
@@ -65,12 +66,55 @@ seats: [],
 ]
 
 export const BookingProvider = ({ children }) => {
+<<<<<<< HEAD
 const [selectedSeats, setSelectedSeats] = useState([])
 const [bookings, setBookings] = useState([])
 const [currentBooking, setCurrentBooking] = useState(null)
 
 const addToCart = (seat) => {
 setSelectedSeats((prev) => [...prev, { ...seat, status: "selected" }])
+=======
+  const [selectedSeats, setSelectedSeats] = useState([])
+  const [movies, setMovies] = useState([])
+  const [loading, setLoading] = useState(true)
+
+ 
+  const addToCart = (seat) => {
+    setSelectedSeats((prev) => [...prev, { ...seat, status: "selected" }])
+  }
+  useEffect(() => {
+    axios.get("http://localhost:8080/movies")
+      .then((res) => {
+        setMovies(res.data)
+      })
+      .catch((err) => console.error("Error fetching movies", err))
+      .finally(() => setLoading(false))
+  }, [])
+  const removeFromCart = (seatId) => {
+    setSelectedSeats((prev) => prev.filter((seat) => seat.id !== seatId))
+  }
+
+  const clearCart = () => {
+    setSelectedSeats([])
+  }
+  
+  return (
+    <BookingContext.Provider
+      value={{
+        movies,
+        theaters: [], 
+        shows: [],
+        selectedSeats,
+        addToCart,
+        removeFromCart,
+        clearCart,
+        loading   
+      }}
+    >
+      {children}
+    </BookingContext.Provider>
+  )
+>>>>>>> fb83f285ec43c00399d72557ef2a42162780931b
 }
 
 const removeFromCart = (seatId) => {
