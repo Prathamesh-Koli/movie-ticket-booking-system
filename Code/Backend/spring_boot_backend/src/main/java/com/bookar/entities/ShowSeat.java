@@ -7,12 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-<<<<<<< HEAD
 
-=======
-import lombok.Getter;
-import lombok.Setter;
->>>>>>> 6163af6 (payment verification done at backend)
 @Entity
 @Table(name = "show_seats",
        uniqueConstraints = @UniqueConstraint(columnNames = {"show_id","seat_id"}))
