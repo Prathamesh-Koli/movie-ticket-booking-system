@@ -1,58 +1,19 @@
-import { useState, useEffect } from "react"
+"use client"
+
+import { useState } from "react"
 import { Container, Row, Col, Card, Button, Form } from "react-bootstrap"
-import axios from 'axios';
 import { useParams, useNavigate } from "react-router-dom"
 import { MapPin, Calendar, Clock } from "lucide-react"
+import { useBooking } from "../contexts/BookingContext"
 
 const ShowSelectionPage = () => {
   const { id } = useParams()
   const navigate = useNavigate()
-
-  const [movie, setMovie] = useState(null)
+  const { movies } = useBooking()
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0])
-  const [selectedLocation, setSelectedLocation] = useState("")
-  const [locations, setLocations] = useState([])
-  const [theaters, setTheaters] = useState([])
+  const [selectedLocation, setSelectedLocation] = useState("Mumbai")
 
-  const dates = Array.from({ length: 7 }, (_, i) => {
-    const date = new Date()
-    date.setDate(date.getDate() + i)
-    return date.toISOString().split("T")[0]
-  })
-
-
-  useEffect(() => {
-    axios.get(`http://localhost:9090/movies/${id}`)
-      .then(response => setMovie(response.data))
-      .catch(console.error);
-  }, [id]);
-
-
-  useEffect(() => {
-    axios.get(`http://localhost:9090/movies/${id}/locations`)
-      .then(response => {
-        setLocations(response.data);
-        setSelectedLocation(response.data[0] || "");
-      })
-      .catch(console.error);
-  }, [id]);
-
-
-  useEffect(() => {
-    if (!selectedLocation || !selectedDate) return;
-    axios.get(`http://localhost:9090/shows/movie/${id}`, {
-      params: {
-        date: selectedDate,
-        location: selectedLocation
-      }
-    })
-      .then(response => setTheaters(response.data))
-      .catch(console.error);
-  }, [id, selectedDate, selectedLocation]);
-
-  const handleShowSelect = (theaterId, showId) => {
-    navigate(`/movie/${id}/seats?theater=${theaterId}&show=${showId}`)
-  }
+  const movie = movies.find((m) => m.id === id)
 
   if (!movie) {
     return (
@@ -66,29 +27,77 @@ const ShowSelectionPage = () => {
       </Container>
     )
   }
+
+  const locations = ["Mumbai", "Delhi", "Bangalore", "Chennai", "Hyderabad"]
+  const dates = Array.from({ length: 7 }, (_, i) => {
+    const date = new Date()
+    date.setDate(date.getDate() + i)
+    return date.toISOString().split("T")[0]
+  })
+
+  const theaters = [
+    {
+      id: "1",
+      name: "PVR Cinemas - Phoenix Mall",
+      location: "Lower Parel, Mumbai",
+      shows: [
+        { id: "1", time: "10:00 AM", price: 200, available: true },
+        { id: "2", time: "1:30 PM", price: 250, available: true },
+        { id: "3", time: "5:00 PM", price: 300, available: false },
+        { id: "4", time: "8:30 PM", price: 350, available: true },
+      ],
+    },
+    {
+      id: "2",
+      name: "INOX - R City Mall",
+      location: "Ghatkopar, Mumbai",
+      shows: [
+        { id: "5", time: "11:00 AM", price: 180, available: true },
+        { id: "6", time: "2:30 PM", price: 220, available: true },
+        { id: "7", time: "6:00 PM", price: 280, available: true },
+        { id: "8", time: "9:30 PM", price: 320, available: true },
+      ],
+    },
+    {
+      id: "3",
+      name: "Cinepolis - Viviana Mall",
+      location: "Thane, Mumbai",
+      shows: [
+        { id: "9", time: "12:00 PM", price: 190, available: true },
+        { id: "10", time: "3:30 PM", price: 240, available: true },
+        { id: "11", time: "7:00 PM", price: 290, available: true },
+        { id: "12", time: "10:30 PM", price: 340, available: false },
+      ],
+    },
+  ]
+
+  const handleShowSelect = (theaterId, showId) => {
+    navigate(`/movie/${id}/seats?theater=${theaterId}&show=${showId}`)
+  }
+
   return (
     <Container className="py-4">
       <Row className="mb-4">
         <Col>
           <div className="d-flex align-items-center mb-3">
             <img
-              src={movie.posterUrl || "/placeholder.svg"}
+              src={movie.poster || "/placeholder.svg"}
               alt={movie.title}
               style={{ width: "60px", height: "80px", objectFit: "cover" }}
               className="rounded me-3"
-            />  
+            />
             <div>
               <h2 className="mb-1">{movie.title}</h2>
               <p className="text-muted mb-0">
-                {(Array.isArray(movie.genres) ? movie.genres.join(", ") : movie.genres)} • {movie.duration}
+                {movie.genre.join(", ")} • {movie.duration}
               </p>
             </div>
-          </div>  
-
+          </div>
         </Col>
       </Row>
 
-      <Row className="mb-3">
+      {/* Filters */}
+      <Row className="mb-4">
         <Col md={6} className="mb-3">
           <Form.Group>
             <Form.Label className="d-flex align-items-center">
@@ -126,20 +135,20 @@ const ShowSelectionPage = () => {
         </Col>
       </Row>
 
+      {/* Theater List */}
       <Row>
         <Col>
           <h4 className="mb-4">Available Shows in {selectedLocation}</h4>
 
           {theaters.map((theater) => (
-            <Card key={theater.theaterId} className="mb-4">
+            <Card key={theater.id} className="mb-4">
               <Card.Body>
                 <Row>
                   <Col md={4} className="mb-3 mb-md-0">
-                    <h5 className="mb-1">{theater.theaterName}</h5>
+                    <h5 className="mb-1">{theater.name}</h5>
                     <p className="text-muted small mb-0">
-                      <MapPin size={15} className="me-1" />
-                      {theater.theaterAddress}
-                      {console.log(theater.theaterAddress)}
+                      <MapPin size={14} className="me-1" />
+                      {theater.location}
                     </p>
                   </Col>
 
@@ -147,26 +156,20 @@ const ShowSelectionPage = () => {
                     <div className="d-flex flex-wrap gap-2">
                       {theater.shows.map((show) => (
                         <Button
-                          key={show.showId}
-                          variant={!show.isAvailable ? "outline-primary" : "outline-secondary"}
-                          
+                          key={show.id}
+                          variant={show.available ? "outline-primary" : "outline-secondary"}
                           size="sm"
-                          disabled={show.isAvailable}
-                          onClick={() => handleShowSelect(theater.theaterId, show.showId)}
+                          disabled={!show.available}
+                          onClick={() => handleShowSelect(theater.id, show.id)}
                           className="d-flex flex-column align-items-center p-2"
                           style={{ minWidth: "80px" }}
                         >
                           <div className="d-flex align-items-center mb-1">
                             <Clock size={14} className="me-1" />
-                            <small className="fw-semibold text-success" style={{ fontSize: "1rem" }}>
-  {show.startTime}
-</small>
-
-
-
-
+                            <small>{show.time}</small>
                           </div>
-                          {show.isAvailable && <small className="text-danger">Sold Out</small>}
+                          <small className="text-success fw-semibold">₹{show.price}</small>
+                          {!show.available && <small className="text-danger">Sold Out</small>}
                         </Button>
                       ))}
                     </div>
