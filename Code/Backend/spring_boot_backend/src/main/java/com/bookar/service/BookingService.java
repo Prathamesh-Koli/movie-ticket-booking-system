@@ -3,6 +3,8 @@ package com.bookar.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.bookar.dto.BookingDTO;
+import com.bookar.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,22 +35,14 @@ public class BookingService {
 	@Autowired
 	private BookingDao bookingDao;
 
-	/**
-	 * Confirms the reservation by:
-	 * - Marking seats as BOOKED
-	 * - Updating reservation status
-	 * - Creating a Booking entry
-	 */
-	
-	public void confirmBooking(Long reservationId, Long userId, String paymentId) {
+	public Long confirmBooking(Long reservationId, Long userId, String paymentId) {
 	    Reservation reservation = reservationDao.findById(reservationId)
-	            .orElseThrow(() -> new RuntimeException("Reservation not found"));
+	        .orElseThrow(() -> new RuntimeException("Reservation not found"));
 
 	    if (reservation.getReservationStatus() != ReservationStatus.PENDING) {
 	        throw new RuntimeException("Reservation is not in pending state");
 	    }
 
-	    // Update seat status to BOOKED
 	    List<ReservationSeat> reservedSeats = reservationSeatDao.findByReservation(reservation);
 	    for (ReservationSeat rs : reservedSeats) {
 	        ShowSeat showSeat = rs.getShowSeat();
@@ -56,32 +50,27 @@ public class BookingService {
 	        showSeatDao.save(showSeat);
 	    }
 
-	    // Update reservation status to CONFIRMED
 	    reservation.setReservationStatus(ReservationStatus.CONFIRMED);
 	    reservationDao.save(reservation);
 
-	    // Create Booking entry
 	    Booking booking = new Booking();
+	    booking.setBookingTime(LocalDateTime.now());
+	    booking.setPaymentId(paymentId);
 	    booking.setUser(reservation.getUser());
 	    booking.setReservation(reservation);
-	    booking.setPaymentId(paymentId);
-	    booking.setBookingTime(LocalDateTime.now());
-	    bookingDao.save(booking); 
+
+	    Booking savedBooking = bookingDao.save(booking);
+	    return savedBooking.getBookingId();
 	}
 
-	/**
-	 * Cancels the reservation and reverts seat status to AVAILABLE
-	 */
-	
 	public void cancelReservation(Long reservationId) {
 	    Reservation reservation = reservationDao.findById(reservationId)
-	            .orElseThrow(() -> new RuntimeException("Reservation not found"));
+	        .orElseThrow(() -> new RuntimeException("Reservation not found"));
 
 	    if (reservation.getReservationStatus() != ReservationStatus.PENDING) {
 	        return;
 	    }
 
-	    // Update seat status to AVAILABLE
 	    List<ReservationSeat> reservedSeats = reservationSeatDao.findByReservation(reservation);
 	    for (ReservationSeat rs : reservedSeats) {
 	        ShowSeat showSeat = rs.getShowSeat();
@@ -89,9 +78,31 @@ public class BookingService {
 	        showSeatDao.save(showSeat);
 	    }
 
-	    // Update reservation status to CANCELLED
 	    reservation.setReservationStatus(ReservationStatus.CANCELLED);
 	    reservationDao.save(reservation);
 	}
 
+	public Booking getBookingById(Long bookingId) {
+	    Booking booking = bookingDao.findById(bookingId)
+	        .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+	    // Force initialization of lazy fields
+	    booking.getReservation().getReservationId();
+	    booking.getUser().getId();
+	    return booking;
+	}
+
+	// ✅ New method to return DTO safely
+	public BookingDTO getBookingDTOById(Long bookingId) {
+	    Booking booking = bookingDao.findById(bookingId)
+	        .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+	    return new BookingDTO(
+	        booking.getBookingId(),
+	        booking.getPaymentId(),
+	        booking.getBookingTime(),
+	        booking.getReservation().getReservationId(),
+	        booking.getUser().getId()
+	    );
+	}
 }

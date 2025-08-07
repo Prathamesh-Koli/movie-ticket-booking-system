@@ -37,6 +37,10 @@ public class User {
 	@Column(length = 10, unique = true, nullable = false)
 	private String mobile_no;
 	
+	@Column(name = "status")
+	private String status = "active";
+
+	
 	@Enumerated(EnumType.STRING)
 	@Column(length = 20, name="gender")
 	private Gender gender;
@@ -54,4 +58,5 @@ public class User {
 	@CreationTimestamp
 	@Column(name="created_at")
 	private LocalDate createdAt;
+
 }

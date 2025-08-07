@@ -3,7 +3,7 @@ package com.bookar.service;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import com.bookar.dto.*;
 import com.bookar.custom_exceptions.ApiException;
 import com.bookar.custom_exceptions.InvalidCredentialsException;
 import com.bookar.custom_exceptions.ResourceNotFoundException;

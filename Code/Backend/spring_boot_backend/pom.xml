@@ -13,9 +13,9 @@
     </parent>
 
     <groupId>com.example</groupId>
-    <artifactId>spring_boot_backend_template</artifactId>
+    <artifactId>spring_boot_backend</artifactId>
     <version>0.0.1</version>
-    <name>spring_boot_backend_template</name>
+    <name>spring_boot_backend</name>
     <description>Spring Boot Template project for developing REST APIs in a Full Stack Application</description>
 
     <properties>
