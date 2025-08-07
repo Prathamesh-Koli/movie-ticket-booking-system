@@ -1,18 +1,17 @@
-import { useState, useEffect } from "react"
+"use client"
+
+import { useState } from "react"
 import { Container, Row, Col, Card, Button, Form } from "react-bootstrap"
-import axios from 'axios';
 import { useParams, useNavigate } from "react-router-dom"
 import { MapPin, Calendar, Clock } from "lucide-react"
+import { useBooking } from "../contexts/BookingContext"
 
 const ShowSelectionPage = () => {
   const { id } = useParams()
   const navigate = useNavigate()
-
-  const [movie, setMovie] = useState(null)
+  const { movies } = useBooking()
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0])
-  const [selectedLocation, setSelectedLocation] = useState("")
-  const [locations, setLocations] = useState([])
-  const [theaters, setTheaters] = useState([])
+  const [selectedLocation, setSelectedLocation] = useState("Mumbai")
 
   const dates = Array.from({ length: 7 }, (_, i) => {
     const date = new Date()
@@ -73,7 +72,7 @@ const ShowSelectionPage = () => {
         <Col>
           <div className="d-flex align-items-center mb-3">
             <img
-              src={movie.posterUrl || "/placeholder.svg"}
+              src={movie.poster || "/placeholder.svg"}
               alt={movie.title}
               style={{ width: "60px", height: "80px", objectFit: "cover" }}
               className="rounded me-3"
@@ -81,7 +80,7 @@ const ShowSelectionPage = () => {
             <div>
               <h2 className="mb-1">{movie.title}</h2>
               <p className="text-muted mb-0">
-                {(Array.isArray(movie.genres) ? movie.genres.join(", ") : movie.genres)} • {movie.duration}
+                {movie.genre.join(", ")} • {movie.duration}
               </p>
             </div>
           </div>
@@ -126,20 +125,20 @@ const ShowSelectionPage = () => {
         </Col>
       </Row>
 
+      {/* Theater List */}
       <Row>
         <Col>
           <h4 className="mb-4">Available Shows in {selectedLocation}</h4>
 
           {theaters.map((theater) => (
-            <Card key={theater.theaterId} className="mb-4">
+            <Card key={theater.id} className="mb-4">
               <Card.Body>
                 <Row>
                   <Col md={4} className="mb-3 mb-md-0">
-                    <h5 className="mb-1">{theater.theaterName}</h5>
+                    <h5 className="mb-1">{theater.name}</h5>
                     <p className="text-muted small mb-0">
-                      <MapPin size={15} className="me-1" />
-                      {theater.theaterAddress}
-                      {console.log(theater.theaterAddress)}
+                      <MapPin size={14} className="me-1" />
+                      {theater.location}
                     </p>
                   </Col>
 
@@ -151,8 +150,8 @@ const ShowSelectionPage = () => {
                           variant={!show.isAvailable ? "outline-primary" : "outline-secondary"}
 
                           size="sm"
-                          disabled={show.isAvailable}
-                          onClick={() => handleShowSelect(theater.theaterId, show.showId)}
+                          disabled={!show.available}
+                          onClick={() => handleShowSelect(theater.id, show.id)}
                           className="d-flex flex-column align-items-center p-2"
                           style={{ minWidth: "80px" }}
                         >
@@ -166,7 +165,8 @@ const ShowSelectionPage = () => {
 
 
                           </div>
-                          {show.isAvailable && <small className="text-danger">Sold Out</small>}
+                          <small className="text-success fw-semibold">₹{show.price}</small>
+                          {!show.available && <small className="text-danger">Sold Out</small>}
                         </Button>
                       ))}
                     </div>
