@@ -1,32 +1,42 @@
-import { useState, useEffect } from "react"
+"use client"
+
+import { useState } from "react"
 import { Container, Row, Col, Card, Button, Alert } from "react-bootstrap"
-import { useParams, useSearchParams, useNavigate } from "react-router-dom"
-import axios from "axios"
+import { useParams, useNavigate, useSearchParams } from "react-router-dom"
 import { useBooking } from "../contexts/BookingContext"
+<<<<<<< HEAD
 import SeatLayout from "../components/layout/SeatLayout"
 import "../styles/SeatLayout.css"
 import { useAuth } from "../contexts/AuthContext"
+=======
+
+>>>>>>> d1bc5bc36f511c3e2641c2081d7ae10454cc0ace
 const SeatSelectionPage = () => {
   const { id } = useParams()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
+<<<<<<< HEAD
   const { selectedSeats, addToCart, removeFromCart } = useBooking()
   const {user}= useAuth()
+=======
+  const { movies, selectedSeats, addToCart, removeFromCart } = useBooking()
+>>>>>>> d1bc5bc36f511c3e2641c2081d7ae10454cc0ace
 
   const theaterId = searchParams.get("theater")
   const showId = searchParams.get("show")
 
-  
-  const [seats, setSeats] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [movie, setMovie] = useState(null)
-  const [showDetails, setShowDetails] = useState(null)
+  const movie = movies.find((m) => m.id === id)
 
-  const [reservationId, setReservationId] = useState(null)
-  const [reservationExpiresAt, setReservationExpiresAt] = useState(null)
+  // Mock seat layout
+  const [seats, setSeats] = useState(() => {
+    const seatLayout = []
+    const rows = ["A", "B", "C", "D", "E", "F", "G", "H"]
 
+    rows.forEach((row, rowIndex) => {
+      const rowSeats = []
+      const seatsPerRow = rowIndex < 2 ? 8 : rowIndex < 5 ? 10 : 12
 
+<<<<<<< HEAD
   useEffect(() => {
     axios.get(`http://localhost:8080/movies/${id}`)
       .then((res) => setMovie(res.data))
@@ -44,15 +54,42 @@ const SeatSelectionPage = () => {
         setShowDetails(res.data)
       } catch (err) {
         console.error("Failed to fetch show details:", err)
+=======
+      for (let i = 1; i <= seatsPerRow; i++) {
+        const seatType = rowIndex < 2 ? "vip" : rowIndex < 5 ? "premium" : "regular"
+        const basePrice = seatType === "vip" ? 400 : seatType === "premium" ? 300 : 200
+        const isBooked = Math.random() < 0.2 // 20% chance of being booked
+
+        rowSeats.push({
+          id: `${row}${i}`,
+          row,
+          number: i,
+          type: seatType,
+          price: basePrice,
+          status: isBooked ? "booked" : "available",
+        })
+>>>>>>> d1bc5bc36f511c3e2641c2081d7ae10454cc0ace
       }
-    }
+      seatLayout.push(rowSeats)
+    })
 
-    if (showId) {
-      fetchShowDetails()
-    }
-  }, [showId])
+    return seatLayout
+  })
 
+  if (!movie) {
+    return (
+      <Container className="py-5">
+        <div className="text-center">
+          <h2>Movie not found</h2>
+          <Button variant="primary" onClick={() => navigate("/")}>
+            Back to Home
+          </Button>
+        </div>
+      </Container>
+    )
+  }
 
+<<<<<<< HEAD
   // Fetch current layout+status
   useEffect(() => {
     const fetchSeats = async () => {
@@ -83,30 +120,32 @@ const SeatSelectionPage = () => {
   }, [showId, theaterId])
 
   // Toggle seat selection
+=======
+>>>>>>> d1bc5bc36f511c3e2641c2081d7ae10454cc0ace
   const handleSeatClick = (seat) => {
-    if (
-      seat.status === "booked" ||
-      seat.status === "unavailable" ||
-      seat.status === "reserved"
-    ) return
+    if (seat.status === "booked") return
 
     const newSeats = seats.map((row) =>
       row.map((s) => {
         if (s.id === seat.id) {
           const newStatus = s.status === "selected" ? "available" : "selected"
+
           if (newStatus === "selected") {
             addToCart(s)
           } else {
             removeFromCart(s.id)
           }
+
           return { ...s, status: newStatus }
         }
         return s
-      })
+      }),
     )
+
     setSeats(newSeats)
   }
 
+<<<<<<< HEAD
   // Reserve seats and proceed to payment
   const handleProceedToPayment = async () => {
     if (selectedSeats.length === 0) return
@@ -166,8 +205,15 @@ navigate(`/checkout?reservation=${res.data.reservationId}`)
       </Container>
     )
 
+=======
+>>>>>>> d1bc5bc36f511c3e2641c2081d7ae10454cc0ace
   const totalAmount = selectedSeats.reduce((sum, seat) => sum + seat.price, 0)
   const selectedSeatCount = selectedSeats.length
+
+  const handleProceedToCheckout = () => {
+    if (selectedSeatCount === 0) return
+    navigate("/checkout")
+  }
 
   return (
     <Container className="py-4">
@@ -175,23 +221,14 @@ navigate(`/checkout?reservation=${res.data.reservationId}`)
         <Col>
           <div className="d-flex align-items-center mb-3">
             <img
-              src={movie.posterUrl || "/placeholder.svg"}
+              src={movie.poster || "/placeholder.svg"}
               alt={movie.title}
               style={{ width: "60px", height: "80px", objectFit: "cover" }}
               className="rounded me-3"
             />
             <div>
               <h2 className="mb-1">{movie.title}</h2>
-              {showDetails ? (
-                <p className="text-muted mb-0">
-                  {showDetails.theaterName} - {showDetails.theaterAddress} |{" "}
-                  {new Date(showDetails.showDate).toLocaleDateString()} @{" "}
-                  {showDetails.startTime}
-                </p>
-              ) : (
-                  <p className="text-muted mb-0">Loading show info...</p>
-                )}
-
+              <p className="text-muted mb-0">PVR Cinemas - Phoenix Mall | Today, 8:30 PM</p>
             </div>
           </div>
         </Col>
@@ -201,11 +238,59 @@ navigate(`/checkout?reservation=${res.data.reservationId}`)
         <Col lg={8} className="mb-4">
           <Card>
             <Card.Body>
-              <SeatLayout
-                seats={seats}
-                onSeatClick={handleSeatClick}
-                selectedSeats={selectedSeats}
-              />
+              <div className="text-center mb-4">
+                <div
+                  className="bg-light rounded mx-auto mb-3"
+                  style={{
+                    width: "200px",
+                    height: "20px",
+                    background: "linear-gradient(to bottom, #f8f9fa, #e9ecef)",
+                  }}
+                >
+                  <small className="text-muted">SCREEN</small>
+                </div>
+              </div>
+
+              <div className="seat-layout">
+                {seats.map((row, rowIndex) => (
+                  <div key={rowIndex} className="d-flex justify-content-center align-items-center mb-2">
+                    <div className="me-3 fw-bold" style={{ width: "20px" }}>
+                      {row[0]?.row}
+                    </div>
+                    <div className="d-flex gap-1">
+                      {row.map((seat, seatIndex) => (
+                        <button
+                          key={seat.id}
+                          className={`seat ${seat.status}`}
+                          onClick={() => handleSeatClick(seat)}
+                          disabled={seat.status === "booked"}
+                          title={`${seat.row}${seat.number} - ₹${seat.price} (${seat.type})`}
+                        >
+                          {seat.number}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="ms-3 fw-bold" style={{ width: "20px" }}>
+                      {row[0]?.row}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="d-flex justify-content-center gap-4 mt-4">
+                <div className="d-flex align-items-center">
+                  <div className="seat available me-2"></div>
+                  <small>Available</small>
+                </div>
+                <div className="d-flex align-items-center">
+                  <div className="seat selected me-2"></div>
+                  <small>Selected</small>
+                </div>
+                <div className="d-flex align-items-center">
+                  <div className="seat booked me-2"></div>
+                  <small>Booked</small>
+                </div>
+              </div>
             </Card.Body>
           </Card>
         </Col>
@@ -219,45 +304,40 @@ navigate(`/checkout?reservation=${res.data.reservationId}`)
               {selectedSeatCount === 0 ? (
                 <Alert variant="info">Please select seats to continue</Alert>
               ) : (
-                  <>
-                    <div className="mb-3">
-                      <h6>Selected Seats ({selectedSeatCount})</h6>
-                      <div className="d-flex flex-wrap gap-1">
-                        {selectedSeats.map((seat) => (
-                          <span key={seat.id} className="badge bg-primary">
-                            {seat.row}{seat.number}
-                          </span>
-                        ))}
-                      </div>
+                <>
+                  <div className="mb-3">
+                    <h6>Selected Seats ({selectedSeatCount})</h6>
+                    <div className="d-flex flex-wrap gap-1">
+                      {selectedSeats.map((seat) => (
+                        <span key={seat.id} className="badge bg-primary">
+                          {seat.row}
+                          {seat.number}
+                        </span>
+                      ))}
                     </div>
+                  </div>
 
-                    <div className="mb-3">
-                      <div className="d-flex justify-content-between mb-2">
-                        <span>Tickets ({selectedSeatCount})</span>
-                        <span>₹{totalAmount}</span>
-                      </div>
-                      <div className="d-flex justify-content-between mb-2">
-                        <span>Convenience Fee</span>
-                        <span>₹{Math.round(totalAmount * 0.1)}</span>
-                      </div>
-                      <hr />
-                      <div className="d-flex justify-content-between fw-bold">
-                        <span>Total Amount</span>
-                        <span>₹{totalAmount + Math.round(totalAmount * 0.1)}</span>
-                      </div>
+                  <div className="mb-3">
+                    <div className="d-flex justify-content-between mb-2">
+                      <span>Tickets ({selectedSeatCount})</span>
+                      <span>₹{totalAmount}</span>
                     </div>
+                    <div className="d-flex justify-content-between mb-2">
+                      <span>Convenience Fee</span>
+                      <span>₹{Math.round(totalAmount * 0.1)}</span>
+                    </div>
+                    <hr />
+                    <div className="d-flex justify-content-between fw-bold">
+                      <span>Total Amount</span>
+                      <span>₹{totalAmount + Math.round(totalAmount * 0.1)}</span>
+                    </div>
+                  </div>
 
-                    <Button
-                      variant="warning"
-                      size="lg"
-                      className="w-100"
-                      onClick={handleProceedToPayment}
-                      disabled={selectedSeatCount === 0}
-                    >
-                      Proceed to Payment
+                  <Button variant="primary" size="lg" className="w-100" onClick={handleProceedToCheckout}>
+                    Proceed to Payment
                   </Button>
-                  </>
-                )}
+                </>
+              )}
             </Card.Body>
           </Card>
         </Col>

@@ -24,6 +24,7 @@ import com.bookar.entities.ReservationStatus;
 import com.bookar.entities.SeatStatus;
 import com.bookar.entities.Show;
 
+
 @Service
 @Transactional
 public class BookingService {

@@ -9,4 +9,5 @@ import lombok.Setter;
 public class PaymentRequestDTO {
     private int amount;
     private Long reservationId;
+
 }

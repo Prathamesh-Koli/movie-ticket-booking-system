@@ -2,7 +2,10 @@ import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { Container, Card, Button, Spinner, Alert, Row, Col } from "react-bootstrap"
 import axios from "axios"
+<<<<<<< HEAD
 import '../styles/TicketPage.css'
+=======
+>>>>>>> d1bc5bc36f511c3e2641c2081d7ae10454cc0ace
 
 const TicketPage = () => {
   const { bookingId } = useParams()
@@ -59,6 +62,7 @@ const TicketPage = () => {
     <Container className="py-4">
       <Row className="justify-content-center">
         <Col md={8}>
+<<<<<<< HEAD
 <Card className="ticket-card"
   style={{ backgroundColor: '#afada7ff' }} //f1c166ff
 >
@@ -112,6 +116,22 @@ const TicketPage = () => {
 
 
 
+=======
+          <Card className="shadow">
+            <Card.Header className="text-center">
+              <h4>Your Movie Ticket</h4>
+            </Card.Header>
+            <Card.Body>
+              <p><strong>Booking ID:</strong> {ticket.id}</p>
+              <p><strong>Payment ID:</strong> {ticket.paymentId}</p>
+              <p><strong>Reservation ID:</strong> {ticket.reservationId}</p>
+              <p><strong>User ID:</strong> {ticket.userId}</p>
+              <p><strong>Booking Time:</strong> {new Date(ticket.bookingTime).toLocaleString()}</p>
+              <hr />
+              <Button variant="primary" onClick={() => navigate("/")}>Book Another Ticket</Button>
+            </Card.Body>
+          </Card>
+>>>>>>> d1bc5bc36f511c3e2641c2081d7ae10454cc0ace
         </Col>
       </Row>
     </Container>
