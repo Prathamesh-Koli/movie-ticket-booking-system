@@ -7,7 +7,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bookar.dto.MovieDetailDTO;
+import com.bookar.dto.MovieHomeResponseDTO;
 import com.bookar.dto.MovieResponseDTO;
+import com.bookar.entities.Genre;
+import com.bookar.entities.MovieStatus;
 import com.bookar.service.MovieService;
 
 import lombok.AllArgsConstructor;
@@ -38,6 +41,21 @@ public class MovieController {
 		MovieDetailDTO dto = movieService.getMovieDetailsById(id);
 		return ResponseEntity.ok(dto);
 	}
+	
+	@GetMapping
+    public List<MovieHomeResponseDTO> getAllMovies() {
+        return movieService.getAllMovies();
+    }
+
+    @GetMapping("/genre/{genre}")
+    public List<MovieHomeResponseDTO> getMoviesByGenre(@PathVariable List<Genre> genres) {
+        return movieService.getMoviesByGenre(genres);
+    }
+
+    @GetMapping("/movies/status/{status}")
+    public ResponseEntity<List<MovieHomeResponseDTO>> getMoviesByStatus(@PathVariable MovieStatus status) {
+        return ResponseEntity.ok(movieService.getMoviesByStatus(status));
+    }
 	
 
 }
