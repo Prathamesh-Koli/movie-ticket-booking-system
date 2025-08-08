@@ -56,7 +56,7 @@ function Login() {
 
           <div className='mb-3 text-end'>
             <span className='text-muted'>Don't have an account? </span>
-            <Link to='/signup'>Register</Link>
+            <Link to='/Register'>Register</Link>
           </div>
 
           <Button variant='primary' onClick={onLogin} className='w-100'>

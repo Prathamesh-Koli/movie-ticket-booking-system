@@ -15,14 +15,19 @@ public class SecurityConfig {
     }
 	
 	@Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf().disable()
-            .authorizeHttpRequests()
-                .anyRequest().permitAll()
-            .and()
-            .formLogin().disable()
-            .httpBasic().disable();
-        return http.build();
-    }
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	    http
+	        .cors()  // ✅ Enable CORS here
+	        .and()
+	        .csrf().disable()
+	        .authorizeHttpRequests()
+	            .anyRequest().permitAll()
+	        .and()
+	        .formLogin().disable()
+	        .httpBasic().disable();
+
+	    return http.build();
+	}
+
+	
 }

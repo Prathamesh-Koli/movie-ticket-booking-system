@@ -5,13 +5,13 @@ import axios from "axios"
 import { useBooking } from "../contexts/BookingContext"
 import SeatLayout from "../components/layout/SeatLayout"
 import "../styles/SeatLayout.css"
-
+import { useAuth } from "../contexts/AuthContext"
 const SeatSelectionPage = () => {
   const { id } = useParams()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const { selectedSeats, addToCart, removeFromCart } = useBooking()
-
+  const {user}= useAuth()
 
   const theaterId = searchParams.get("theater")
   const showId = searchParams.get("show")
@@ -28,7 +28,7 @@ const SeatSelectionPage = () => {
 
 
   useEffect(() => {
-    axios.get(`http://localhost:9090/movies/${id}`)
+    axios.get(`http://localhost:8080/movies/${id}`)
       .then((res) => setMovie(res.data))
       .catch((err) => {
         console.error(err)
@@ -40,7 +40,7 @@ const SeatSelectionPage = () => {
   useEffect(() => {
     const fetchShowDetails = async () => {
       try {
-        const res = await axios.get(`http://localhost:9090/shows/${showId}/details`)
+        const res = await axios.get(`http://localhost:8080/shows/${showId}/details`)
         setShowDetails(res.data)
       } catch (err) {
         console.error("Failed to fetch show details:", err)
@@ -59,7 +59,7 @@ const SeatSelectionPage = () => {
       try {
         setLoading(true)
         const res = await axios.get(
-          `http://localhost:9090/seatselection/show/${showId}?theaterId=${theaterId}`
+          `http://localhost:8080/seatselection/show/${showId}?theaterId=${theaterId}`
         )
         console.log("Fetched seat data:", res.data)
 
@@ -115,13 +115,13 @@ const SeatSelectionPage = () => {
 
       const payload = {
         showId: parseInt(showId),
-        userId: 100, // userId: /* derive from context/user state */ /** TODO: replace with actual user ID */,
+        userId: user.id , /* derive from context/user state */ /** TODO: replace with actual user ID */
         showSeatIds: selectedSeats.map((s) => s.showSeatId)
       };
 
       console.log("Reservation Payload:", payload);
 
-      const res = await axios.post("http://localhost:9090/seatselection/reserve", payload)
+      const res = await axios.post("http://localhost:8080/seatselection/reserve", payload)
 
       console.log("Reservation Response:", res.data)
 
@@ -138,7 +138,9 @@ const SeatSelectionPage = () => {
       )
       setSeats(updated)
 
-      navigate(`/payment?reservation=${res.data.reservationId}`)
+//      navigate(`/payment?reservation=${res.data.reservationId}`)
+navigate(`/checkout?reservation=${res.data.reservationId}`)
+
     } catch (e) {
       console.error("Reservation failed:", e)
       alert("Unable to reserve seats. Please try again.")

@@ -102,7 +102,7 @@ const CustomNavbar = () => {
               <div className="dropdown">
                 <Button variant="outline-primary" className="d-flex align-items-center" onClick={handleProfileClick}>
                   <User size={18} className="me-2" />
-                  {user.name}
+                  {user.firstname}
                 </Button>
                 <div className="dropdown-menu">
                   <button className="dropdown-item" onClick={() => navigate("/profile")}>
@@ -114,7 +114,7 @@ const CustomNavbar = () => {
                 </div>
               </div>
             ) : (
-              <Button variant="primary" onClick={() => setShowLoginModal(true)}>
+              <Button variant="primary" onClick={() => navigate('/login')}>
                 Sign In
               </Button>
             )}

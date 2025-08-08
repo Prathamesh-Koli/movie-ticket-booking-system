@@ -3,7 +3,6 @@ package com.bookar.entities;
 import java.time.LocalDate;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.context.annotation.Fallback;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -38,6 +37,10 @@ public class User {
 	@Column(length = 10, unique = true, nullable = false)
 	private String mobile_no;
 	
+	@Column(name = "status")
+	private String status = "active";
+
+	
 	@Enumerated(EnumType.STRING)
 	@Column(length = 20, name="gender")
 	private Gender gender;
@@ -55,4 +58,5 @@ public class User {
 	@CreationTimestamp
 	@Column(name="created_at")
 	private LocalDate createdAt;
+
 }

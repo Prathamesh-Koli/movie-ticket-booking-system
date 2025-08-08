@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -100,6 +101,9 @@ public class ReservationServiceImpl implements ReservationService {
         dto.setTicketAmount(ticketAmount);
         dto.setConvenienceFee(fee);
         dto.setTotalPayable(total);
+        dto.setMovieName(show.getMovie().getTitle());
+        dto.setTheaterName(show.getScreen().getTheater().getTheaterName());
+        dto.setShowTime(show.getStartTime());
 
         return dto;
     }
@@ -129,4 +133,52 @@ public class ReservationServiceImpl implements ReservationService {
                 showSeatDao.save(showSeat);
             });
     }
+    @Override
+    public ReservationResponseDTO getReservationById(Long id) {
+        Optional<Reservation> optionalReservation = reservationDao.findById(id);
+
+        if (!optionalReservation.isPresent()) {
+            throw new RuntimeException("Reservation not found with ID: " + id);
+        }
+
+        Reservation reservation = optionalReservation.get();
+        Show show = reservation.getShow();
+
+        // Calculate amounts like in reserveSeats()
+        BigDecimal ticketAmount = reservation.getReservationSeats()
+            .stream()
+            .map(rs -> BigDecimal.valueOf(rs.getShowSeat().getSeat().getPrice()))
+            .reduce(BigDecimal.ZERO, BigDecimal::add)
+            .setScale(2, RoundingMode.HALF_UP);
+
+        BigDecimal fee = ticketAmount.multiply(BigDecimal.valueOf(0.10)).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal total = ticketAmount.add(fee).setScale(2, RoundingMode.HALF_UP);
+        reservation.setTotalAmount(total);
+        reservationDao.save(reservation);
+
+        ReservationResponseDTO dto = new ReservationResponseDTO();
+        dto.setReservationId(reservation.getReservationId()); 
+        dto.setUserId(reservation.getUser().getId());
+        dto.setShowId(reservation.getShow().getShowId());
+        dto.setTheaterId(reservation.getShow().getScreen().getTheater().getTheaterId());
+        dto.setShowSeatIds(
+            reservation.getReservationSeats()
+                .stream()
+                .map(seat -> seat.getShowSeat().getShowSeatId())
+                .collect(Collectors.toList())
+        );
+        dto.setReservedAt(reservation.getReservedAt());
+        dto.setExpiresAt(reservation.getExpiresAt());
+        dto.setReservationStatus(reservation.getReservationStatus().name());
+        dto.setTicketAmount(ticketAmount);
+        dto.setConvenienceFee(fee);
+        dto.setTotalPayable(total);
+        dto.setMovieName(show.getMovie().getTitle()); 
+        dto.setTheaterName(show.getScreen().getTheater().getTheaterName());
+        dto.setShowTime(show.getStartTime());
+        return dto;
+    }
+
+
+
 }

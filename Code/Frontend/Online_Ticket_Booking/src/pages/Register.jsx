@@ -34,7 +34,8 @@ function Register() {
     }
   })
 
-  const onRegister = async () => {
+  const onRegister = async (e) => {
+    
     const {
       firstname,
       lastname,
@@ -85,10 +86,11 @@ function Register() {
       district
     )
 
+
     if (result.status === 201) {
       toast.success(`Welcome to BooKar ${result.data.firstname}!`)
       sessionStorage.setItem('user', JSON.stringify(result.data))
-      navigate('/home')
+      navigate('/')
     } else {
       toast.error(`Error: ${result.data.msg}`)
     }

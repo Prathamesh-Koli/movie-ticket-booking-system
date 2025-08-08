@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
   const [showLoginModal, setShowLoginModal] = useState(false)
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("user")
+    const savedUser = sessionStorage.getItem("user")
     if (savedUser) {
       setUser(JSON.parse(savedUser))
     }
