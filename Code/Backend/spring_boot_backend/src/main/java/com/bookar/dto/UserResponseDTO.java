@@ -9,9 +9,11 @@ import com.bookar.entities.Role;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 public class UserResponseDTO {
 	private Long id;
 	private String firstname;

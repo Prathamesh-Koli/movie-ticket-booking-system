@@ -36,8 +36,16 @@ public class Theater {
 	@OneToMany(mappedBy = "theater")
 	private List<Screen> screens;
 	
+	@Enumerated(EnumType.STRING)
+	@Column(name="status", length=20)
+	private TheatreStatus status;
+	
 	@CreationTimestamp
 	@Column(name="created_at")
 	private LocalDate createdAt;
 	
+	@ManyToOne
+	@JoinColumn(name = "owner_id")
+	private User owner;
+
 }

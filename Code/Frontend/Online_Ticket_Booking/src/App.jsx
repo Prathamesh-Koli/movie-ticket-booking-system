@@ -6,6 +6,7 @@ import SeatSelectionPage from "./pages/SeatSelectionPage"
 import Login from './pages/Login';
 import Register from './pages/Register';
 import UserProfilePage from "./pages/UserProfilePage";
+import TheatreManageShowsPage from "./pages/TheatreManageShowPage";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
             <Route path='signin' element={<Login/>}/>
             <Route path='profile' element={<UserProfilePage/>}/>
             <Route path="signup" element={<Register/>}/>
+            <Route path="/dashboard/shows" element={<TheatreManageShowsPage/>}/>
           </Routes>
         </main>
         {/* <Footer /> */}

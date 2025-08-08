@@ -1,5 +1,9 @@
 package com.bookar.service;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.sql.Date;
+import java.sql.Time;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,15 +11,19 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.bookar.dao.MovieDao;
+import com.bookar.custom_exceptions.ResourceNotFoundException;
 import com.bookar.dao.ShowDao;
+import com.bookar.dao.ShowSeatTypePriceDao;
 import com.bookar.dto.ShowDetailsDTO;
 import com.bookar.dto.ShowTimeDTO;
 import com.bookar.dto.TheaterShowDTO;
+import com.bookar.dto.TheaterShowManageDTO;
 import com.bookar.entities.Show;
+import com.bookar.entities.ShowStatus;
 import com.bookar.entities.Theater;
 
 import lombok.AllArgsConstructor;
@@ -26,6 +34,7 @@ import lombok.AllArgsConstructor;
 public class ShowServiceImpl implements ShowService {
 
     private ShowDao showDao;
+    private ShowSeatTypePriceDao showSeatTypePriceDao;
 
     @Override
     public List<TheaterShowDTO> getTheatersWithShows(Long movieId, LocalDate date, String location) {
@@ -55,7 +64,6 @@ public class ShowServiceImpl implements ShowService {
                 showTimes
             ));
         }
-
         return result;
     }
 
@@ -64,6 +72,56 @@ public class ShowServiceImpl implements ShowService {
 		return showDao.getShowDetailsByShowId(showId);
 	}
 
+	@Override
+	public List<TheaterShowManageDTO> getShowManagementDetails(Long ownerId) {
+		int res = showDao.expireOldShows();
+		List<Object[]> results = showDao.findShowStatsByOwner(ownerId);
+
+        List<TheaterShowManageDTO> dtos = new ArrayList<>();
+
+        for (Object[] row : results) {
+        	TheaterShowManageDTO dto = new TheaterShowManageDTO();
+        	dto.setShowId(((Number) row[0]).longValue());
+        	dto.setMovieTitle((String) row[1]);
+        	dto.setTheaterName((String) row[2]);
+        	dto.setScreenNumber((String) row[3]);
+        	dto.setShowDate(((Date) row[4]).toLocalDate());
+        	dto.setStartTime(((Time) row[5]).toLocalTime());
+        	dto.setShowStatus((String) row[6]);
+        	dto.setTotalSeats(((Number) row[7]).intValue());
+        	dto.setBookedSeats(((Number) row[8]).intValue());
+        	dto.setRevenue(row[9] != null ? ((Number) row[9]).doubleValue() : 0.0);
+
+        	// occupancy rate calculation
+        	int total = dto.getTotalSeats(), booked = dto.getBookedSeats();
+        	dto.setOccupancyRate(total == 0 ? 0.0 : (booked * 100.0 / total));
+
+            // Fetch seat type prices for the show
+            Map<String, Double> prices = showSeatTypePriceDao.findPricesByShowId(dto.getShowId());
+            dto.setSeatTypePrices(prices);
+
+            dtos.add(dto);
+        }
+
+        return dtos;
+	}
+
+	@Override
+    public void deleteShow(Long showId) {
+        Show show = showDao.findById(showId)
+            .orElseThrow(() -> new ResourceNotFoundException("Show not found with ID: " + showId));
+        showDao.delete(show);
+    }
+
+	@Override
+	public void activateShow(Long showId) {
+	    showDao.updateShowStatus(showId, ShowStatus.ACTIVE);
+	}
+
 	
+	@Override
+	public void deactivateShow(Long showId) {
+	    showDao.updateShowStatus(showId, ShowStatus.SCHEDULED);
+	}
 }
 

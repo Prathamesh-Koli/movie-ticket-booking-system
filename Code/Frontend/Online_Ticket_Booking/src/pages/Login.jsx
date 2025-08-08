@@ -4,6 +4,7 @@ import { toast } from 'react-toastify'
 import { loginUser } from '../services/user'
 import { Container, Card, Form, Button } from 'react-bootstrap'
 
+
 function Login() {
   const [info, setInfo] = useState({
     email: '',
@@ -17,13 +18,14 @@ function Login() {
     if (email.length === 0) toast.warn('Please enter Email!')
     else if (password.length === 0) toast.warn('Please enter Password!')
     else {
-      const result = await loginUser(email, password)
-      if (result.status === 200) {
-        toast.success(`Welcome to BooKar ${result.data.firstname}!`)
-        sessionStorage.setItem('user', JSON.stringify(result.data))
+      const response = await loginUser(email, password)
+      if (response.status === 200) {
+        const token = response.data
+        console.log(token)
+        localStorage.setItem("token", token);
         navigate('/profile')
       } else {
-        toast.error(`Error: ${result.data.msg}`)
+        toast.error(`Error: ${response.data.msg}`)
       }
     }
   }

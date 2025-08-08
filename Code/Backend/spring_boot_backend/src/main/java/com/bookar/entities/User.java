@@ -1,9 +1,15 @@
 package com.bookar.entities;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.context.annotation.Fallback;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -18,7 +24,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString(exclude = "address")
 @EqualsAndHashCode
-public class User {
+public class User implements UserDetails {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -44,15 +50,33 @@ public class User {
 	
 	private LocalDate dob;
 	
+	
+	
 	@Enumerated(EnumType.STRING)
 	@Column(length = 20, name="role")
 	private Role role;
 	
-	@OneToOne(cascade = CascadeType.ALL, fetch=FetchType.EAGER)
+	@OneToOne(cascade = CascadeType.ALL, fetch=FetchType.EAGER, orphanRemoval = true)
 	@JoinColumn(name = "address_id")
 	private Address address;
 	
 	@CreationTimestamp
 	@Column(name="created_at")
 	private LocalDate createdAt;
+
+	
+	
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(this.role.name());
+		return authorities;
+	}
+
+	@Override
+	public String getUsername() {
+		return this.email;
+	}
+	
+	
+	
 }
