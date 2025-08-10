@@ -1,6 +1,11 @@
 package com.bookar.service;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.hibernate.type.internal.UserTypeSqlTypeAdapter;
 import org.modelmapper.ModelMapper;
@@ -15,6 +20,9 @@ import com.bookar.custom_exceptions.InvalidCredentialsException;
 import com.bookar.custom_exceptions.ResourceNotFoundException;
 import com.bookar.dao.CustomerDao;
 import com.bookar.dto.UserApiResponse;
+import com.bookar.dto.BookingDetailsDTO;
+import com.bookar.dto.BookingResponseDTO;
+import com.bookar.dto.SeatDTO;
 import com.bookar.dto.SignInDTO;
 import com.bookar.dto.UserAddressDTO;
 import com.bookar.dto.UserRequestDTO;
@@ -108,5 +116,46 @@ public class CustomerServiceImpl implements CustomerService
 		}
 		throw new InvalidCredentialsException("The current password you entered is incorrect. Please try again !!!");
 	}
+	
+	
+	public List<BookingResponseDTO> getBookingsForUser(Long userId) {
+        List<Object[]> rows = custDao.findBookingsByUserId(userId);
+
+        List<BookingDetailsDTO> flatList = rows.stream().map(row -> {
+            BookingDetailsDTO dto = new BookingDetailsDTO();
+            dto.setBookingId(((Number) row[0]).longValue());
+            dto.setMovieTitle((String) row[1]);
+            dto.setTheaterName((String) row[2]);
+            dto.setScreenNumber(String.valueOf(row[3]));
+            dto.setBookingDate(((java.sql.Timestamp) row[4]).toLocalDateTime().toLocalDate());
+            dto.setShowTime(((java.sql.Time) row[5]).toLocalTime());
+            dto.setSeatId(((Number) row[6]).longValue());
+            dto.setRowLabel((String) row[7]);
+            dto.setSeatNumber(((Number) row[8]).intValue());
+            dto.setTotalAmount(((Number) row[9]).doubleValue());
+            dto.setStatus(((String) row[10]).toLowerCase());
+            return dto;
+        }).collect(Collectors.toList());
+
+        // Group by bookingId
+        Map<Long, BookingResponseDTO> grouped = new LinkedHashMap<>();
+        for (BookingDetailsDTO dto : flatList) {
+            grouped.computeIfAbsent(dto.getBookingId(), id -> {
+                BookingResponseDTO resp = new BookingResponseDTO();
+                resp.setId(dto.getBookingId());
+                resp.setMovieTitle(dto.getMovieTitle());
+                resp.setTheaterName(dto.getTheaterName());
+                resp.setScreenNumber(dto.getScreenNumber());
+                resp.setBookingDate(dto.getBookingDate());
+                resp.setShowTime(dto.getShowTime());
+                resp.setTotalAmount(dto.getTotalAmount());
+                resp.setStatus(dto.getStatus());
+                resp.setSeats(new ArrayList<>());
+                return resp;
+            }).getSeats().add(new SeatDTO(dto.getSeatId(), dto.getRowLabel(), dto.getSeatNumber()));
+        }
+
+        return new ArrayList<>(grouped.values());
+    }
 
 }

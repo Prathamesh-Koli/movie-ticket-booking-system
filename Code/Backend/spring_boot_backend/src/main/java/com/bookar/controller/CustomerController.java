@@ -1,5 +1,7 @@
 package com.bookar.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bookar.dto.BookingResponseDTO;
 import com.bookar.dto.SignInDTO;
 import com.bookar.dto.UserRequestDTO;
 import com.bookar.dto.UserResponseDTO;
@@ -75,4 +78,11 @@ public class CustomerController {
 	public ResponseEntity<?> updatePassword(@RequestBody updatePasswordDTO newPass){
 		return ResponseEntity.status(HttpStatus.CREATED).body(customerService.updatePassword(newPass));
 	}
+	
+	@GetMapping("/bookings")
+    public List<BookingResponseDTO> getBookings(@RequestHeader("Authorization") String authHeader) {
+		String token = authHeader.replace("Bearer", "").trim();
+		Long id = jwtUtil.extractId(token);
+        return customerService.getBookingsForUser(id);
+    }
 }

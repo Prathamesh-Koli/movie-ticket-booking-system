@@ -132,6 +132,6 @@ public interface ShowDao extends JpaRepository<Show, Long> {
 
 	@Modifying
 	@Query("UPDATE Show s SET s.showStatus = :status WHERE s.id = :showId")
-	void updateShowStatus(Long showId, ShowStatus status);
+	void updateShowStatus(@Param("showId") Long showId, @Param("status") ShowStatus status);
 
 }

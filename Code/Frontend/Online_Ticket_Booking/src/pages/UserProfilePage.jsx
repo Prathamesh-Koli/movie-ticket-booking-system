@@ -6,14 +6,14 @@ import { updateUser, updatePassword, fetchUserDetails } from "../services/user"
 import { toast } from "react-toastify"
 import axios from 'axios'
 import { config } from '../services/config'
-// import { useBooking } from "../contexts/BookingContext"
 import { useNavigate } from "react-router-dom"
 
 function UserProfilePage() {
     const navigate = useNavigate()
-    // const { bookings } = useBooking()
     const [activeTab, setActiveTab] = useState("profile")
     const [user, setUser] = useState(null)
+    const [bookings, setBookings] = useState([])
+    const [loadingBookings, setLoadingBookings] = useState(false)
     const [newPass, setNewPass] = useState({ id: 0, oldPassword: "", newPassword: "" })
     const [profileData, setProfileData] = useState({
         id: 0,
@@ -33,14 +33,12 @@ function UserProfilePage() {
             pincode: "",
             district: ""
         }
-
     })
 
     useEffect(() => {
         const fetchDetails = async () => {
             const userData = await fetchUserDetails()
             if (userData != null) {
-                // Update state if needed
                 setUser(userData);
 
                 setNewPass({
@@ -49,7 +47,6 @@ function UserProfilePage() {
                     oldPassword: ""
                 })
 
-                // Initialize profileData with server-fetched values
                 setProfileData({
                     id: userData.id,
                     firstname: userData.firstname,
@@ -68,25 +65,39 @@ function UserProfilePage() {
                         pincode: userData.address.pincode
                     }
                 })
+                fetchBookings(userData.id)
             } else {
                 toast.error("Failed to Load the User")
             }
-
         };
 
         fetchDetails();
     }, []);
 
+    const fetchBookings = async (userId) => {
+        try {
+            setLoadingBookings(true)
+            const res = await axios.get(`http://localhost:8080/user/bookings`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+            })
+            console.log(res.data)
+            setBookings(Array.isArray(res.data) ? res.data : [res.data])
+        } catch (err) {
+            toast.error("Failed to load bookings")
+            console.error(err)
+        } finally {
+            setLoadingBookings(false)
+        }
+    }
 
     const handleProfileUpdate = async (e) => {
         e.preventDefault()
         const { id, firstname, lastname, email, password, mobile_no, gender, role, dob, address: { addr_line1, addr_line2, town_city, state, pincode, district } } = profileData
 
-
         if (firstname.length == 0) {
             alert("Please Enter Firstname !!")
         } else if (lastname.length == 0) {
-            alert("Please Enter Lasttname !!")
+            alert("Please Enter Lastname !!")
         } else if (email.length == 0) {
             alert("Please Enter Email !!")
         } else if (password.length == 0) {
@@ -104,7 +115,6 @@ function UserProfilePage() {
         } else if (state.length == 0) {
             alert("Please Enter The State !!")
         }
-
 
         const result = await updateUser(id, firstname, lastname, email, password, mobile_no, gender, role, dob, addr_line1, addr_line2, town_city, state, pincode, district)
         if (result.status == 201) {
@@ -131,7 +141,6 @@ function UserProfilePage() {
             }
         }
     }
-
 
     const logout = () => {
         sessionStorage.removeItem("user")
@@ -168,7 +177,7 @@ function UserProfilePage() {
                             </Badge>
 
                             <Nav variant="pills" className="flex-column">
-                                <Nav.Item className="mb-2">
+                                <Nav.Item className="mb-2" key="nav-profile">
                                     <Nav.Link
                                         active={activeTab === "profile"}
                                         onClick={() => setActiveTab("profile")}
@@ -178,7 +187,7 @@ function UserProfilePage() {
                                         Profile
                                     </Nav.Link>
                                 </Nav.Item>
-                                <Nav.Item>
+                                <Nav.Item key="nav-password">
                                     <Nav.Link
                                         active={activeTab === "Change Password"}
                                         onClick={() => setActiveTab("Change Password")}
@@ -188,7 +197,7 @@ function UserProfilePage() {
                                         Change Password
                                     </Nav.Link>
                                 </Nav.Item>
-                                <Nav.Item className="mb-2">
+                                <Nav.Item className="mb-2" key="nav-bookings">
                                     <Nav.Link
                                         active={activeTab === "bookings"}
                                         onClick={() => setActiveTab("bookings")}
@@ -198,7 +207,7 @@ function UserProfilePage() {
                                         My Bookings
                                     </Nav.Link>
                                 </Nav.Item>
-                                <Nav.Item className="mb-2">
+                                <Nav.Item className="mb-2" key="nav-payments">
                                     <Nav.Link
                                         active={activeTab === "payments"}
                                         onClick={() => setActiveTab("payments")}
@@ -208,7 +217,7 @@ function UserProfilePage() {
                                         Payment Methods
                                     </Nav.Link>
                                 </Nav.Item>
-                                <Nav.Item>
+                                <Nav.Item key="nav-settings">
                                     <Nav.Link
                                         active={activeTab === "settings"}
                                         onClick={() => setActiveTab("settings")}
@@ -224,13 +233,15 @@ function UserProfilePage() {
                 </Col>
 
                 <Col md={9}>
-                    {/*{activeTab === "bookings" && (
+                    {activeTab === "bookings" && (
                         <Card>
                             <Card.Header>
                                 <h5 className="mb-0">My Bookings</h5>
                             </Card.Header>
                             <Card.Body>
-                                {bookings.length === 0 ? (
+                                {loadingBookings ? (
+                                    <p className="text-center text-muted">Loading bookings...</p>
+                                ) : bookings.length === 0 ? (
                                     <div className="text-center py-5">
                                         <Ticket size={48} className="text-muted mb-3" />
                                         <h5>No bookings yet</h5>
@@ -240,30 +251,37 @@ function UserProfilePage() {
                                         </Button>
                                     </div>
                                 ) : (
-                                    <div className="space-y-3">
-                                        {bookings.map((booking) => (
-                                            <Card key={booking.id} className="mb-3">
+                                    <div>
+                                        {bookings.map((booking, bookingIndex) => (
+                                            <Card key={booking.id || `booking-${bookingIndex}`} className="mb-3">
                                                 <Card.Body>
                                                     <Row>
-                                                        <Col md={8}>
-                                                            <h6 className="mb-2">Avengers: Endgame</h6>
-                                                            <p className="text-muted small mb-1">PVR Cinemas - Phoenix Mall | Screen 1</p>
+                                                        <Col md={8} key="booking-details">
+                                                            <h6 className="mb-2">{booking.movieTitle}</h6>
+                                                            <p className="text-muted small mb-1">
+                                                                {booking.theaterName} | {booking.screenNumber}
+                                                            </p>
                                                             <p className="text-muted small mb-2">
                                                                 <Calendar size={14} className="me-1" />
-                                                                {new Date(booking.bookingDate).toLocaleDateString()} | 8:30 PM
+                                                                {new Date(booking.bookingDate).toLocaleDateString()} |{" "}
+                                                                {booking.showTime}
                                                             </p>
                                                             <div className="d-flex gap-1 mb-2">
-                                                                {booking.seats.map((seat) => (
-                                                                    <Badge key={seat.id} bg="primary">
-                                                                        {seat.row}
-                                                                        {seat.number}
+                                                                {(booking.seats || []).map((seat, seatIndex) => (
+                                                                    <Badge key={seat.id || `seat-${bookingIndex}-${seatIndex}`} bg="primary">
+                                                                        {seat.row}{seat.number}
                                                                     </Badge>
                                                                 ))}
                                                             </div>
                                                         </Col>
-                                                        <Col md={4} className="text-end">
-                                                            <h6 className="text-success">₹{booking.totalAmount}</h6>
-                                                            <Badge bg={booking.status === "confirmed" ? "success" : "danger"} className="mb-2">
+                                                        <Col md={4} className="text-end" key="booking-actions">
+                                                            <h6 className="text-success">
+                                                                ₹{booking.totalAmount?.toFixed(2) || "0.00"}
+                                                            </h6>
+                                                            <Badge
+                                                                bg={booking.status === "confirmed" ? "success" : "danger"}
+                                                                className="mb-2"
+                                                            >
                                                                 {booking.status}
                                                             </Badge>
                                                             <div>
@@ -280,7 +298,7 @@ function UserProfilePage() {
                                 )}
                             </Card.Body>
                         </Card>
-                    )}*/}
+                    )}
 
                     {activeTab === "Change Password" && (
                         <Card>
@@ -290,21 +308,21 @@ function UserProfilePage() {
                             <Card.Body>
                                 <Form onSubmit={changePassword}>
                                     <Row>
-                                        <Col md={6} className="mb-3">
+                                        <Col md={6} className="mb-3" key="old-password">
                                             <Form.Group>
                                                 <Form.Label>Password</Form.Label>
                                                 <Form.Control
-                                                    type="text"
+                                                    type="password"
                                                     placeholder="Enter The Old Password"
                                                     onChange={(e) => setNewPass({ ...newPass, oldPassword: e.target.value })}
                                                 />
                                             </Form.Group>
                                         </Col>
-                                        <Col md={6} className="mb-3">
+                                        <Col md={6} className="mb-3" key="new-password">
                                             <Form.Group>
                                                 <Form.Label>New Password</Form.Label>
                                                 <Form.Control
-                                                    type="text"
+                                                    type="password"
                                                     placeholder="Enter The New Password"
                                                     onChange={(e) => setNewPass({ ...newPass, newPassword: e.target.value })}
                                                 />
@@ -318,8 +336,7 @@ function UserProfilePage() {
                                 </Form>
                             </Card.Body>
                         </Card>
-                    )
-                    }
+                    )}
 
                     {activeTab === "profile" && (
                         <Card>
@@ -329,7 +346,7 @@ function UserProfilePage() {
                             <Card.Body style={{ maxHeight: "43vh", overflowY: "auto", paddingRight: "1rem" }}>
                                 <Form onSubmit={handleProfileUpdate}>
                                     <Row>
-                                        <Col md={6} className="mb-3">
+                                        <Col md={6} className="mb-3" key="firstname-col">
                                             <Form.Group>
                                                 <Form.Label>First Name</Form.Label>
                                                 <Form.Control
@@ -339,7 +356,7 @@ function UserProfilePage() {
                                                 />
                                             </Form.Group>
                                         </Col>
-                                        <Col md={6} className="mb-3">
+                                        <Col md={6} className="mb-3" key="lastname-col">
                                             <Form.Group>
                                                 <Form.Label>Last Name</Form.Label>
                                                 <Form.Control
@@ -351,7 +368,7 @@ function UserProfilePage() {
                                         </Col>
                                     </Row>
                                     <Row>
-                                        <Col md={6} className="mb-3">
+                                        <Col md={6} className="mb-3" key="email-col">
                                             <Form.Group>
                                                 <Form.Label>Email</Form.Label>
                                                 <Form.Control
@@ -361,7 +378,7 @@ function UserProfilePage() {
                                                 />
                                             </Form.Group>
                                         </Col>
-                                        <Col md={6} className="mb-3">
+                                        <Col md={6} className="mb-3" key="phone-col">
                                             <Form.Group>
                                                 <Form.Label>Phone Number</Form.Label>
                                                 <Form.Control
@@ -373,7 +390,7 @@ function UserProfilePage() {
                                         </Col>
                                     </Row>
                                     <Row>
-                                        <Col md={6} className="mb-3">
+                                        <Col md={6} className="mb-3" key="dob-col">
                                             <Form.Group>
                                                 <Form.Label>Date of Birth</Form.Label>
                                                 <Form.Control
@@ -383,7 +400,7 @@ function UserProfilePage() {
                                                 />
                                             </Form.Group>
                                         </Col>
-                                        <Col md={6} className="mb-3">
+                                        <Col md={6} className="mb-3" key="gender-col">
                                             <Form.Group>
                                                 <Form.Label>Gender</Form.Label>
                                                 <Form.Control
@@ -393,14 +410,13 @@ function UserProfilePage() {
                                                 />
                                             </Form.Group>
                                         </Col>
-
                                     </Row>
                                     <Row><br /></Row>
                                     <Row>
                                         <h5 className="mb-0"><b>Address Details</b></h5>
                                     </Row>
                                     <Row>
-                                        <Col md={6} className="mb-3">
+                                        <Col md={6} className="mb-3" key="addr1-col">
                                             <Form.Group>
                                                 <Form.Label>Address Line 1</Form.Label>
                                                 <Form.Control
@@ -410,7 +426,7 @@ function UserProfilePage() {
                                                 />
                                             </Form.Group>
                                         </Col>
-                                        <Col md={6} className="mb-3">
+                                        <Col md={6} className="mb-3" key="addr2-col">
                                             <Form.Group>
                                                 <Form.Label>Address Line 2</Form.Label>
                                                 <Form.Control
@@ -422,7 +438,7 @@ function UserProfilePage() {
                                         </Col>
                                     </Row>
                                     <Row>
-                                        <Col md={6} className="mb-3">
+                                        <Col md={6} className="mb-3" key="city-col">
                                             <Form.Group>
                                                 <Form.Label>City/Town</Form.Label>
                                                 <Form.Control
@@ -432,7 +448,7 @@ function UserProfilePage() {
                                                 />
                                             </Form.Group>
                                         </Col>
-                                        <Col md={6} className="mb-3">
+                                        <Col md={6} className="mb-3" key="district-col">
                                             <Form.Group>
                                                 <Form.Label>District</Form.Label>
                                                 <Form.Control
@@ -444,7 +460,7 @@ function UserProfilePage() {
                                         </Col>
                                     </Row>
                                     <Row>
-                                        <Col md={6} className="mb-3">
+                                        <Col md={6} className="mb-3" key="state-col">
                                             <Form.Group>
                                                 <Form.Label>State</Form.Label>
                                                 <Form.Control
@@ -454,7 +470,7 @@ function UserProfilePage() {
                                                 />
                                             </Form.Group>
                                         </Col>
-                                        <Col md={6} className="mb-3">
+                                        <Col md={6} className="mb-3" key="pincode-col">
                                             <Form.Group>
                                                 <Form.Label>Pincode</Form.Label>
                                                 <Form.Control
@@ -495,28 +511,28 @@ function UserProfilePage() {
                                 <h5 className="mb-0">Account Settings</h5>
                             </Card.Header>
                             <Card.Body>
-                                <div className="d-flex justify-content-between align-items-center py-3 border-bottom">
+                                <div className="d-flex justify-content-between align-items-center py-3 border-bottom" key="email-notifications">
                                     <div>
                                         <h6 className="mb-1">Email Notifications</h6>
                                         <small className="text-muted">Receive booking confirmations and updates</small>
                                     </div>
                                     <Form.Check type="switch" defaultChecked />
                                 </div>
-                                <div className="d-flex justify-content-between align-items-center py-3 border-bottom">
+                                <div className="d-flex justify-content-between align-items-center py-3 border-bottom" key="sms-notifications">
                                     <div>
                                         <h6 className="mb-1">SMS Notifications</h6>
                                         <small className="text-muted">Receive SMS alerts for bookings</small>
                                     </div>
                                     <Form.Check type="switch" defaultChecked />
                                 </div>
-                                <div className="d-flex justify-content-between align-items-center py-3 border-bottom">
+                                <div className="d-flex justify-content-between align-items-center py-3 border-bottom" key="marketing-emails">
                                     <div>
                                         <h6 className="mb-1">Marketing Emails</h6>
                                         <small className="text-muted">Receive promotional offers and updates</small>
                                     </div>
                                     <Form.Check type="switch" />
                                 </div>
-                                <div className="pt-3">
+                                <div className="pt-3" key="logout-section">
                                     <Button variant="danger" onClick={logout}>
                                         Logout
                                     </Button>

@@ -46,6 +46,6 @@ public class Theater {
 	
 	@ManyToOne
 	@JoinColumn(name = "owner_id")
-	private User owner;
+	private User ownerId;
 
 }

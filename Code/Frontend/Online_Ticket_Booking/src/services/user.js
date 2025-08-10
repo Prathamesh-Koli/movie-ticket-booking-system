@@ -50,6 +50,8 @@ export async function fetchUserDetails() {
     }
 }
 
+
+
 export async function updateUser(id, firstname, lastname, email, password, mobile_no, gender, role, dob, addr_line1, addr_line2, town_city, state, pincode, district) {
     try {
         const url = `${config.serverUrl}/user/update`

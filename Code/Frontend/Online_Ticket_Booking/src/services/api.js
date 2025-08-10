@@ -5,8 +5,9 @@ const BASE_URL = 'http://localhost:8080/user' // Adjust as per backend
 const BASE = "http://localhost:8080";
 
 // Fetch shows for a specific theater owner
-export const fetchOwnerShows = async (ownerId) => {
+export const fetchOwnerShows = async () => {
   try {
+    const token = localStorage.getItem("token")
     const response = await axios.get(`${BASE_URL}/shows/manage/`,{
       headers: {
         Authorization: `Bearer ${token}`,

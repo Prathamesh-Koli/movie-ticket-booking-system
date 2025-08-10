@@ -21,7 +21,7 @@ const TheatreManageShowsPage = () => {
   const loadShows = async () => {
     try {
       setLoading(true)
-      const data = await fetchOwnerShows(5) // Pass ownerId here
+      const data = await fetchOwnerShows() // Pass ownerId here
       console.log("Fetched shows from API:", data)
 
       const mapShow = (show) => ({
@@ -258,7 +258,7 @@ const TheatreManageShowsPage = () => {
         <Col>
           <div className="d-flex justify-content-between align-items-center">
             <h1>My Shows</h1>
-            <Button variant="primary" onClick={() => navigate("/owner/theaters")}>Schedule New Show</Button>
+            <Button variant="primary" onClick={() => navigate("/owner/theaters/5/add-show")}>Schedule New Show</Button>
           </div>
         </Col>
       </Row>

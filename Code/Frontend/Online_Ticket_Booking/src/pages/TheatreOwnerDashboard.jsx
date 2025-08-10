@@ -143,7 +143,7 @@ const TheatreOwnerDashboard = () => {
                   </Button>
                 </Col>
                 <Col lg={3} md={6} className="mb-3">
-                  <Button variant="success" size="lg" className="w-100" onClick={() => navigate("/owner/theaters")}>
+                  <Button variant="success" size="lg" className="w-100" onClick={() => navigate("/owner/theaters/:theaterId/add-show")}>
                     Add Show
                   </Button>
                 </Col>

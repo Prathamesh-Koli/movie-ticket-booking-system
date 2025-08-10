@@ -1,6 +1,10 @@
 package com.bookar.service;
 
 import com.bookar.dto.UserApiResponse;
+
+import java.util.List;
+
+import com.bookar.dto.BookingResponseDTO;
 import com.bookar.dto.SignInDTO;
 import com.bookar.dto.UserAddressDTO;
 import com.bookar.dto.UserRequestDTO;
@@ -15,4 +19,5 @@ public interface CustomerService {
 	UserResponseDTO getDetailsById(Long id);
 	UserApiResponse updatePassword(updatePasswordDTO newPass);  
 	UserResponseDTO getCompleteDetails(String Email);
+	List<BookingResponseDTO> getBookingsForUser(Long userId);
 }
