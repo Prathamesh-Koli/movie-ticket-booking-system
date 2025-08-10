@@ -98,6 +98,9 @@ import ContactUs from "./pages/ContactUs";
 import TermsOfUse from "./pages/TermsOfUse";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import AboutUs from "./pages/AboutUs";
+import ManageTheaters from "./pages/ManageTheaters"
+import TheaterListPage from "./pages/TheaterListPage"
+import AddTheaterPage from "./pages/AddTheaterPage";
 
 function App() {
   return (
@@ -117,6 +120,9 @@ function App() {
                   <Route path="/signup" element={<Register />} />
                   <Route path="/profile" element={<UserProfilePage />} />
                   <Route path="/search" element={<SearchPage />} />
+                  <Route path="/theaters" element={<ManageTheaters />} />
+                  <Route path="/owner/add-theater" element={<AddTheaterPage />} />
+                   <Route path="/owner/theaters" element={<TheaterListPage />} />
                   {/* Footer pages */}
                   <Route path="/contact-us" element={<ContactUs />} />
                   <Route path="/terms-of-use" element={<TermsOfUse />} />
