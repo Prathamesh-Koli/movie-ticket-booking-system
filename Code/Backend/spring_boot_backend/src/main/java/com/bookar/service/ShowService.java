@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.bookar.dto.CreateShowDTO;
 import com.bookar.dto.ShowDetailsDTO;
 import com.bookar.dto.TheaterShowDTO;
 import com.bookar.dto.TheaterShowManageDTO;
@@ -20,5 +21,6 @@ public interface ShowService {
 	void deleteShow(Long showId);
     void activateShow(Long showId);
     void deactivateShow(Long showId);
+	void createShowWithLayout(Long theaterId, CreateShowDTO dto);
     
 }

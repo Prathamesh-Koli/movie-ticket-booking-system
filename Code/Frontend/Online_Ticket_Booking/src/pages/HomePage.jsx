@@ -95,10 +95,9 @@ const HomePage = () => {
                             <Button variant="outline-primary" size="sm" onClick={() => navigate(`/search?query=Drama`)}>Drama</Button>
                             <Button variant="outline-primary" size="sm" onClick={() => navigate(`/search?query=Horror`)}>Horror</Button>
                             <Button variant="outline-primary" size="sm" onClick={() => navigate(`/search?query=Sci-Fi`)}>Sci-Fi</Button>
-                            <Button variant="outline-primary" size="sm" onClick={() => navigate(`/search?query=Thriller`)}>Thriller</Button>
-                            <Button variant="outline-primary" size="sm" onClick={() => navigate(`/search?query=Crime`)}>Crime</Button>
                             <Button variant="outline-primary" size="sm" onClick={() => navigate(`/search?query=Adventure`)}>Adventure</Button>
-                            <Button variant="outline-primary" size="sm" onClick={() => navigate(`/search?query=Romance`)}>Romance</Button>
+                            <Button variant="outline-primary" size="sm" onClick={() => navigate(`/search?query=Crime`)}>Crime</Button>
+
                         </div>
                     </Col>
                 </Row>

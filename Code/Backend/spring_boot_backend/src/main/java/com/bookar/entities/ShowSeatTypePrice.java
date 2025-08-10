@@ -2,6 +2,7 @@ package com.bookar.entities;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,3 +29,5 @@ public class ShowSeatTypePrice {
     @Column(name = "price", nullable = false)
     private double price;
 }
+
+

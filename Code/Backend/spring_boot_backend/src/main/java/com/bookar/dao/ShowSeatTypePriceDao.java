@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.bookar.entities.SeatType;
+import com.bookar.entities.Show;
 import com.bookar.entities.ShowSeatTypePrice;
 
 public interface ShowSeatTypePriceDao extends JpaRepository<ShowSeatTypePrice, Long> {
@@ -24,4 +25,6 @@ public interface ShowSeatTypePriceDao extends JpaRepository<ShowSeatTypePrice, L
         }
         return map;
     }
+
+    List<ShowSeatTypePrice> findByShow(Show show);
 }

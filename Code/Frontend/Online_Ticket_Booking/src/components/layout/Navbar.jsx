@@ -51,6 +51,8 @@ const CustomNavbar = () => {
 
 
         <div className="d-flex align-items-center d-lg-none">
+
+
           <Button
             variant={theme === "light" ? "outline-dark" : "outline-light"}
             size="sm"
@@ -94,6 +96,15 @@ const CustomNavbar = () => {
 
 
           <Nav className="ms-auto align-items-center">
+            <Button
+              variant={theme === "light" ? "outline-dark" : "outline-light"}
+              size="sm"
+              className="me-3"
+              onClick={() => navigate("/")}
+            >
+              Home
+            </Button>
+
             <Button variant="outline-secondary" size="sm" onClick={toggleTheme} className="me-3 d-none d-lg-block">
               {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
             </Button>
@@ -114,7 +125,7 @@ const CustomNavbar = () => {
                 </div>
               </div>
             ) : (
-              <Button variant="primary" onClick={() => navigate("/signin")}>
+              <Button variant="primary" onClick={() => navigate('/signin')}>
                 Sign In
               </Button>
             )}

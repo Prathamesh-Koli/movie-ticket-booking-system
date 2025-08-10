@@ -28,7 +28,7 @@ const SeatSelectionPage = () => {
 
 
   useEffect(() => {
-    axios.get(`http://localhost:9090/movies/${id}`)
+    axios.get(`http://localhost:8080/movies/${id}`)
       .then((res) => setMovie(res.data))
       .catch((err) => {
         console.error(err)
@@ -40,7 +40,7 @@ const SeatSelectionPage = () => {
   useEffect(() => {
     const fetchShowDetails = async () => {
       try {
-        const res = await axios.get(`http://localhost:9090/shows/${showId}/details`)
+        const res = await axios.get(`http://localhost:8080/shows/${showId}/details`)
         setShowDetails(res.data)
       } catch (err) {
         console.error("Failed to fetch show details:", err)
@@ -53,13 +53,13 @@ const SeatSelectionPage = () => {
   }, [showId])
 
 
-  // Fetch current layout+status
+
   useEffect(() => {
     const fetchSeats = async () => {
       try {
         setLoading(true)
         const res = await axios.get(
-          `http://localhost:9090/seatselection/show/${showId}?theaterId=${theaterId}`
+          `http://localhost:8080/seatselection/show/${showId}?theaterId=${theaterId}`
         )
         console.log("Fetched seat data:", res.data)
 
@@ -82,7 +82,7 @@ const SeatSelectionPage = () => {
     if (showId && theaterId) fetchSeats()
   }, [showId, theaterId])
 
-  // Toggle seat selection
+
   const handleSeatClick = (seat) => {
     if (
       seat.status === "booked" ||
@@ -121,14 +121,13 @@ const SeatSelectionPage = () => {
 
       console.log("Reservation Payload:", payload);
 
-      const res = await axios.post("http://localhost:9090/seatselection/reserve", payload)
+      const res = await axios.post("http://localhost:8080/seatselection/reserve", payload)
 
       console.log("Reservation Response:", res.data)
 
       setReservationId(res.data.reservationId)
       setReservationExpiresAt(res.data.expiresAt)
 
-      // locally mark selected seats as “reserved”
       const updated = seats.map((row) =>
         row.map((s) =>
           selectedSeats.find((sel) => sel.id === s.id)

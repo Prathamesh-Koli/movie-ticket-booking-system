@@ -16,14 +16,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bookar.custom_exceptions.ResourceNotFoundException;
+import com.bookar.dao.MovieDao;
+import com.bookar.dao.ScreenDao;
+import com.bookar.dao.SeatDao;
 import com.bookar.dao.ShowDao;
+import com.bookar.dao.ShowSeatDao;
 import com.bookar.dao.ShowSeatTypePriceDao;
+import com.bookar.dto.CreateShowDTO;
 import com.bookar.dto.ShowDetailsDTO;
 import com.bookar.dto.ShowTimeDTO;
 import com.bookar.dto.TheaterShowDTO;
 import com.bookar.dto.TheaterShowManageDTO;
 import com.bookar.dto.TheatreDashboardDTO;
+import com.bookar.entities.Movie;
+import com.bookar.entities.Screen;
+import com.bookar.entities.Seat;
+import com.bookar.entities.SeatStatus;
 import com.bookar.entities.Show;
+import com.bookar.entities.ShowSeat;
+import com.bookar.entities.ShowSeatTypePrice;
 import com.bookar.entities.ShowStatus;
 import com.bookar.entities.Theater;
 
@@ -36,6 +47,10 @@ public class ShowServiceImpl implements ShowService {
 
     private ShowDao showDao;
     private ShowSeatTypePriceDao showSeatTypePriceDao;
+    private ScreenDao screenDao;
+    private SeatDao seatDao;
+    private ShowSeatDao showSeatDao;
+    private MovieDao movieDao;
 
     @Override
     public List<TheaterShowDTO> getTheatersWithShows(Long movieId, LocalDate date, String location) {
@@ -142,5 +157,41 @@ public class ShowServiceImpl implements ShowService {
 
 	    return dto;
     }
+
+	@Override
+    public void createShowWithLayout(Long theaterId, CreateShowDTO dto) {
+		  
+		  Movie movie = movieDao.findById(dto.getMovieId()).orElseThrow(()->new ResourceNotFoundException("Movie Not Found"));
+		  Screen screen = screenDao.findById(dto.getScreenId()).orElseThrow(()-> new ResourceNotFoundException("Screen Not Found"));
+
+		 
+		  Show show = new Show();
+		  show.setMovie(movie);
+		  show.setScreen(screen);
+		  show.setShowDate(dto.getShowDate());
+		  show.setStartTime(dto.getShowTime());
+		  show.setShowStatus(ShowStatus.SCHEDULED); 
+		  showDao.save(show);
+
+		  
+		  dto.getSeatPrices().forEach((type, price) -> {
+		    ShowSeatTypePrice p = new ShowSeatTypePrice();
+		    p.setShow(show);
+		    p.setSeatType(type);
+		    p.setPrice(price);
+		    showSeatTypePriceDao.save(p);
+		  });
+
+		
+		  List<Seat> seats = seatDao.findByScreen_ScreenId(screen.getScreenId());
+		  for (Seat s : seats) {
+		    ShowSeat ss = new ShowSeat();
+		    ss.setShow(show);
+		    ss.setSeat(s);
+		    ss.setSeatStatus(SeatStatus.AVAILABLE);
+		    showSeatDao.save(ss);
+		  }
+		}
+
 }
 

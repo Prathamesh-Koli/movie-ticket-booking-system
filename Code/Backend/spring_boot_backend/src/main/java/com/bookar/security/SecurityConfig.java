@@ -20,12 +20,12 @@ public class SecurityConfig {
 	private CustomUserDetailsService userDetailsService;
 	@Autowired
 	private JwtFilter jwtFilter;
-	
+
 	@Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-	
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+
 	@Bean
 	AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
 		AuthenticationManagerBuilder authManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
@@ -37,8 +37,10 @@ public class SecurityConfig {
 	SecurityFilterChain authorizeRequests(HttpSecurity http) throws Exception {
 		http
 				.csrf(csrf -> csrf.disable())
+				.cors(cors -> {
+				})
 				.authorizeHttpRequests(requests -> requests
-						.requestMatchers("/user/**","/movies/**").permitAll()
+						.requestMatchers("/user/**", "/movies/**").permitAll()
 						.requestMatchers("/cust/**").hasRole("CUSTOMER")
 						.requestMatchers("/admin/**").hasRole("ADMIN")
 						.anyRequest().authenticated())
@@ -47,5 +49,5 @@ public class SecurityConfig {
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 		return http.build();
 	}
-	
+
 }

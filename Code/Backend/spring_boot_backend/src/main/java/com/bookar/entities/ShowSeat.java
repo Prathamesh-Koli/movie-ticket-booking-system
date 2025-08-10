@@ -30,4 +30,7 @@ public class ShowSeat {
     @Enumerated(EnumType.STRING)
     @Column(name="seat_status",nullable = false)
     private SeatStatus seatStatus;  
+
+    @OneToMany(mappedBy = "showSeat", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReservationSeat> reservationSeats;
 }
