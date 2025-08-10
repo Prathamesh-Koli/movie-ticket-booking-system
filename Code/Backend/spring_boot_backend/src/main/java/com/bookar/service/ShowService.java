@@ -18,5 +18,7 @@ public interface ShowService {
 	void deleteShow(Long showId);
     void activateShow(Long showId);
     void deactivateShow(Long showId);
+
+	void createShowWithLayout(Long theaterId, CreateShowDTO dto);
     
 }

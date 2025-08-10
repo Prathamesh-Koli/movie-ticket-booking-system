@@ -123,5 +123,40 @@ public class ShowServiceImpl implements ShowService {
 	public void deactivateShow(Long showId) {
 	    showDao.updateShowStatus(showId, ShowStatus.SCHEDULED);
 	}
+
+    public void createShowWithLayout(Long theaterId, CreateShowDTO dto) {
+		  
+		  Movie movie = movieDao.findById(dto.getMovieId()).orElseThrow(()->new ResourceNotFoundException("Movie Not Found"));
+		  Screen screen = screenDao.findById(dto.getScreenId()).orElseThrow(()-> new ResourceNotFoundException("Screen Not Found"));
+
+		 
+		  Show show = new Show();
+		  show.setMovie(movie);
+		  show.setScreen(screen);
+		  show.setShowDate(dto.getShowDate());
+		  show.setStartTime(dto.getShowTime());
+		  show.setShowStatus(ShowStatus.SCHEDULED); 
+		  showDao.save(show);
+
+		  
+		  dto.getSeatPrices().forEach((type, price) -> {
+		    ShowSeatTypePrice p = new ShowSeatTypePrice();
+		    p.setShow(show);
+		    p.setSeatType(type);
+		    p.setPrice(price);
+		    priceDao.save(p);
+		  });
+
+		
+		  List<Seat> seats = seatDao.findByScreen_ScreenId(screen.getScreenId());
+		  for (Seat s : seats) {
+		    ShowSeat ss = new ShowSeat();
+		    ss.setShow(show);
+		    ss.setSeat(s);
+		    ss.setSeatStatus(SeatStatus.AVAILABLE);
+		    showSeatDao.save(ss);
+		  }
+		}
+
 }
 
