@@ -7,7 +7,11 @@ const BASE = "http://localhost:8080";
 // Fetch shows for a specific theater owner
 export const fetchOwnerShows = async (ownerId) => {
   try {
-    const response = await axios.get(`${BASE_URL}/shows/manage/${ownerId}`)
+    const response = await axios.get(`${BASE_URL}/shows/manage/`,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
     return response.data
   } catch (error) {
     console.error("Error fetching shows:", error)

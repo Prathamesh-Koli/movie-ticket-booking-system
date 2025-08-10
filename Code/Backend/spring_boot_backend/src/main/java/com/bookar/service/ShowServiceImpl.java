@@ -51,10 +51,6 @@ public class ShowServiceImpl implements ShowService {
     private SeatDao seatDao;
     private ShowSeatDao showSeatDao;
     private ShowSeatTypePriceDao showSeatTypePriceDao;
-    private ScreenDao screenDao;
-    private SeatDao seatDao;
-    private ShowSeatDao showSeatDao;
-    private MovieDao movieDao;
 
     @Override
     public List<TheaterShowDTO> getTheatersWithShows(Long movieId, LocalDate date, String location) {

@@ -1,5 +1,6 @@
 package com.bookar.entities;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
