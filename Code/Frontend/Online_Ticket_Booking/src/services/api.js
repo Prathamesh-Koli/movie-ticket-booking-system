@@ -2,6 +2,8 @@ import axios from 'axios'
 
 const BASE_URL = 'http://localhost:8080/user' // Adjust as per backend
 
+const BASE = "http://localhost:8080";
+
 // Fetch shows for a specific theater owner
 export const fetchOwnerShows = async (ownerId) => {
   try {
@@ -46,3 +48,39 @@ export const fetchDashboardStats = async (ownerId) => {
     throw new Error("Failed to load dashboard statistics")
   }
 }
+
+export const fetchMoviesForShows = async () => {
+  const { data } = await axios.get(`${BASE}/movies/shows`);
+   return data;
+ };
+ 
+ export const fetchTheaterById = async (theaterId) => {
+    const { data } = await axios.get(`${BASE}/theaters/${theaterId}`);
+    return data;
+   };
+ 
+   export const fetchLayoutByTheaterId = async (theaterId) => {
+     const { data } = await axios.get(`${BASE}/theaters/${theaterId}/getlayout`);
+     return data;
+   };
+ 
+ 
+   export const addShow = async (theaterId, showData) => {
+         const payload = {
+         movieId:    showData.movieId,
+         screenId:   showData.screenId,    
+         showDate:   showData.showDate,    
+         showTime:   showData.showTime, 
+         seatPrices: showData.seatPrices,
+       };
+     
+       const { data } = await axios.post(`${BASE}/shows/theaters/${theaterId}`, payload);
+       return data;
+     };  
+ 
+ 
+     export const addLayout = async (theaterId, layoutRequestDTO) => {
+       const { data } = await axios.post(`${BASE}/theaters/${theaterId}/savelayout`, layoutRequestDTO);
+       return data;
+     };
+   
