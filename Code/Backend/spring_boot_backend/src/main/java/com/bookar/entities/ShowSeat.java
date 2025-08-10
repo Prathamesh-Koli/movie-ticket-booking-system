@@ -1,5 +1,7 @@
 package com.bookar.entities;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,4 +32,7 @@ public class ShowSeat {
     @Enumerated(EnumType.STRING)
     @Column(name="seat_status",nullable = false)
     private SeatStatus seatStatus;  
+
+    @OneToMany(mappedBy = "showSeat", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReservationSeat> reservationSeats;
 }

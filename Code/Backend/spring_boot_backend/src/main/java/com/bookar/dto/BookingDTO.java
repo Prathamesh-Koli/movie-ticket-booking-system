@@ -9,7 +9,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-
 public class BookingDTO {
 private Long id;
 private String paymentId;

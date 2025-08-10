@@ -32,7 +32,6 @@ public class PaymentVerificationController {
         try {
             String payload = req.getRazorpayOrderId() + "|" + req.getRazorpayPaymentId();
             String expectedSignature = generateHmacSHA256(payload, razorpayKeySecret);
-
             System.out.println("Order ID: " + req.getRazorpayOrderId());
             System.out.println("Payment ID: " + req.getRazorpayPaymentId());
             System.out.println("Signature from Razorpay: " + req.getRazorpaySignature());
@@ -60,7 +59,6 @@ public class PaymentVerificationController {
             SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "HmacSHA256");
             mac.init(secretKey);
             byte[] hash = mac.doFinal(data.getBytes());
-
 
             StringBuilder hex = new StringBuilder();
             for (byte b : hash) {
