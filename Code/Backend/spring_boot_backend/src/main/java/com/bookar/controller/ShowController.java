@@ -36,4 +36,12 @@ public class ShowController {
     public ShowDetailsDTO getShowDetails(@PathVariable Long showId) {
         return showService.getShowDetails(showId);
     }
+
+    @PostMapping("/theaters/{theaterId}")
+    public ResponseEntity<?> addShow(
+        @PathVariable Long theaterId,
+        @RequestBody CreateShowDTO dto) {
+      showService.createShowWithLayout(theaterId, dto);
+      return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 }
