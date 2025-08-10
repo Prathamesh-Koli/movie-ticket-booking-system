@@ -100,6 +100,9 @@ import TermsOfUse from "./pages/TermsOfUse";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import LayoutPage from "./pages/LayoutPage"
 import AboutUs from "./pages/AboutUs";
+import ManageTheaters from "./pages/ManageTheaters"
+import TheaterListPage from "./pages/TheaterListPage"
+import AddTheaterPage from "./pages/AddTheaterPage";
 import TheatreManageShowsPage from './pages/TheatreManageShowPage';
 import TheatreOwnerDashboard from "./pages/TheatreOwnerDashboard";
 
@@ -122,6 +125,9 @@ function App() {
                   <Route path="/signup" element={<Register />} />
                   <Route path="/profile" element={<UserProfilePage />} />
                   <Route path="/search" element={<SearchPage />} />
+                  <Route path="/theaters" element={<ManageTheaters />} />
+                  <Route path="/owner/add-theater" element={<AddTheaterPage />} />
+                   <Route path="/owner/theaters" element={<TheaterListPage />} />
                   <Route path="/owner/:theaterId/layout" element={<LayoutPage />} />
                   <Route path="/dashboard/shows" element={<TheatreManageShowsPage/>}/>
                   <Route path="/dashboard" element={<TheatreOwnerDashboard/>}></Route>
