@@ -2,6 +2,7 @@ package com.bookar.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import com.bookar.entities.ShowSeat;
@@ -30,5 +31,9 @@ public class ReservationResponseDTO {
     private BigDecimal ticketAmount;
     private BigDecimal convenienceFee;
     private BigDecimal totalPayable;
+	
+    private String movieName;
+    private String theaterName;
+    private LocalTime showTime;
 
 }

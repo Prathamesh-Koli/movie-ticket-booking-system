@@ -51,6 +51,9 @@ public class User implements UserDetails {
 	private LocalDate dob;
 	
 	
+	@Column(name = "status")
+	private String status = "active";
+
 	
 	@Enumerated(EnumType.STRING)
 	@Column(length = 20, name="role")
