@@ -1,11 +1,9 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { Container, Row, Col, Card, Button, Spinner } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
-import { fetchDashboardStats } from "../../utils/api"
+import { fetchDashboardStats } from "../services/api"
 
-const TheatreDashboardPage = () => {
+const TheatreOwnerDashboard = () => {
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
@@ -56,8 +54,8 @@ const TheatreDashboardPage = () => {
         <Col lg={3} md={6} className="mb-3">
           <Card className="text-center h-100">
             <Card.Body>
-              <Card.Title className="text-muted">Theaters Awaiting Approval</Card.Title>
-              <Card.Text className="display-4 text-warning">{stats?.theatersAwaitingApproval || 0}</Card.Text>
+              <Card.Title className="text-muted">Pending Theaters</Card.Title>
+              <Card.Text className="display-4 text-warning">{stats?.pendingTheaters ?? 0}</Card.Text>
             </Card.Body>
           </Card>
         </Col>
@@ -65,15 +63,15 @@ const TheatreDashboardPage = () => {
           <Card className="text-center h-100">
             <Card.Body>
               <Card.Title className="text-muted">Approved Theaters</Card.Title>
-              <Card.Text className="display-4 text-success">{stats?.approvedTheaters || 0}</Card.Text>
+              <Card.Text className="display-4 text-success">{stats?.approvedTheaters ?? 0}</Card.Text>
             </Card.Body>
           </Card>
         </Col>
         <Col lg={3} md={6} className="mb-3">
           <Card className="text-center h-100">
             <Card.Body>
-              <Card.Title className="text-muted">Total Shows Scheduled</Card.Title>
-              <Card.Text className="display-4 text-info">{stats?.totalShowsScheduled || 0}</Card.Text>
+              <Card.Title className="text-muted">Total Theaters</Card.Title>
+              <Card.Text className="display-4 text-info">{stats?.totalTheaters ?? 0}</Card.Text>
             </Card.Body>
           </Card>
         </Col>
@@ -81,29 +79,45 @@ const TheatreDashboardPage = () => {
           <Card className="text-center h-100">
             <Card.Body>
               <Card.Title className="text-muted">Total Revenue</Card.Title>
-              <Card.Text className="display-6 text-primary">{formatCurrency(stats?.totalRevenue || 0)}</Card.Text>
+              <Card.Text className="display-6 text-primary">
+                {formatCurrency(stats?.totalRevenue ?? 0)}
+              </Card.Text>
             </Card.Body>
           </Card>
         </Col>
       </Row>
 
-      {/* Additional Revenue Stats */}
+      {/* Shows Stats */}
       <Row className="mb-4">
-        <Col md={6} className="mb-3">
+        <Col lg={3} md={6} className="mb-3">
           <Card className="text-center h-100">
             <Card.Body>
-              <Card.Title className="text-muted">Monthly Revenue</Card.Title>
-              <Card.Text className="display-6 text-success">{formatCurrency(stats?.monthlyRevenue || 0)}</Card.Text>
-              <small className="text-muted">Current month earnings</small>
+              <Card.Title className="text-muted">Active Shows</Card.Title>
+              <Card.Text className="display-4 text-success">{stats?.activeShows ?? 0}</Card.Text>
             </Card.Body>
           </Card>
         </Col>
-        <Col md={6} className="mb-3">
+        <Col lg={3} md={6} className="mb-3">
+          <Card className="text-center h-100">
+            <Card.Body>
+              <Card.Title className="text-muted">Scheduled Shows</Card.Title>
+              <Card.Text className="display-4 text-warning">{stats?.scheduledShows ?? 0}</Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col lg={3} md={6} className="mb-3">
+          <Card className="text-center h-100">
+            <Card.Body>
+              <Card.Title className="text-muted">Today's Revenue</Card.Title>
+              <Card.Text className="display-4 text-info">{stats?.todaysRevenue ?? 0}</Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col lg={3} md={6} className="mb-3">
           <Card className="text-center h-100">
             <Card.Body>
               <Card.Title className="text-muted">Today's Bookings</Card.Title>
-              <Card.Text className="display-4 text-info">{stats?.todayBookings || 0}</Card.Text>
-              <small className="text-muted">Tickets sold today</small>
+              <Card.Text className="display-4 text-info">{stats?.todaysBookings ?? 0}</Card.Text>
             </Card.Body>
           </Card>
         </Col>
@@ -134,7 +148,7 @@ const TheatreDashboardPage = () => {
                   </Button>
                 </Col>
                 <Col lg={3} md={6} className="mb-3">
-                  <Button variant="info" size="lg" className="w-100" onClick={() => navigate("/owner/shows")}>
+                  <Button variant="info" size="lg" className="w-100" onClick={() => navigate("/dashboard/shows")}>
                     Manage Shows
                   </Button>
                 </Col>
@@ -147,4 +161,4 @@ const TheatreDashboardPage = () => {
   )
 }
 
-export default TheatreDashboardPage
+export default TheatreOwnerDashboard

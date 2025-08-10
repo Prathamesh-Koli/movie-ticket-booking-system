@@ -28,7 +28,7 @@ import com.bookar.service.CustomerService;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-@CrossOrigin(origins = "http://localhost:5174")
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/user")
 @AllArgsConstructor

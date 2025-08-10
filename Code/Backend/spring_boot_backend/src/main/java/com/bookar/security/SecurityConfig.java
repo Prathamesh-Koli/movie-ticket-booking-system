@@ -38,7 +38,7 @@ public class SecurityConfig {
 		http
 				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(requests -> requests
-						.requestMatchers("/user/**").permitAll()
+						.requestMatchers("/user/**","/movies/**").permitAll()
 						.requestMatchers("/cust/**").hasRole("CUSTOMER")
 						.requestMatchers("/admin/**").hasRole("ADMIN")
 						.anyRequest().authenticated())
@@ -47,17 +47,5 @@ public class SecurityConfig {
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 		return http.build();
 	}
-	
-	/*@Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf().disable()
-            .authorizeHttpRequests()
-                .anyRequest().permitAll()
-            .and()
-            .formLogin().disable()
-            .httpBasic().disable();
-        return http.build();
-    }*/
 	
 }

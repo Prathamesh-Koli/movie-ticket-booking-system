@@ -22,6 +22,7 @@ import com.bookar.dto.ShowDetailsDTO;
 import com.bookar.dto.ShowTimeDTO;
 import com.bookar.dto.TheaterShowDTO;
 import com.bookar.dto.TheaterShowManageDTO;
+import com.bookar.dto.TheatreDashboardDTO;
 import com.bookar.entities.Show;
 import com.bookar.entities.ShowStatus;
 import com.bookar.entities.Theater;
@@ -75,35 +76,36 @@ public class ShowServiceImpl implements ShowService {
 	@Override
 	public List<TheaterShowManageDTO> getShowManagementDetails(Long ownerId) {
 		int res = showDao.expireOldShows();
-		List<Object[]> results = showDao.findShowStatsByOwner(ownerId);
+	    List<Object[]> results = showDao.findShowStatsByOwner(ownerId);
 
-        List<TheaterShowManageDTO> dtos = new ArrayList<>();
+	    List<TheaterShowManageDTO> dtos = new ArrayList<>();
 
-        for (Object[] row : results) {
-        	TheaterShowManageDTO dto = new TheaterShowManageDTO();
-        	dto.setShowId(((Number) row[0]).longValue());
-        	dto.setMovieTitle((String) row[1]);
-        	dto.setTheaterName((String) row[2]);
-        	dto.setScreenNumber((String) row[3]);
-        	dto.setShowDate(((Date) row[4]).toLocalDate());
-        	dto.setStartTime(((Time) row[5]).toLocalTime());
-        	dto.setShowStatus((String) row[6]);
-        	dto.setTotalSeats(((Number) row[7]).intValue());
-        	dto.setBookedSeats(((Number) row[8]).intValue());
-        	dto.setRevenue(row[9] != null ? ((Number) row[9]).doubleValue() : 0.0);
+	    for (Object[] row : results) {
+	        TheaterShowManageDTO dto = new TheaterShowManageDTO();
+	        dto.setShowId(((Number) row[0]).longValue());
+	        dto.setMovieTitle((String) row[1]);
+	        dto.setTheaterName((String) row[2]);
+	        dto.setScreenNumber((String) row[3]);
+	        dto.setShowDate(((Date) row[4]).toLocalDate());
+	        dto.setStartTime(((Time) row[5]).toLocalTime());
+	        dto.setShowStatus((String) row[6]);
+	        dto.setTotalSeats(((Number) row[7]).intValue());
+	        dto.setBookedSeats(((Number) row[8]).intValue());
+	        dto.setRevenue(row[9] != null ? ((Number) row[9]).doubleValue() : 0.0);
+	        dto.setTodaysRevenue(row[10] != null ? ((Number) row[10]).doubleValue() : 0.0); // new mapping
 
-        	// occupancy rate calculation
-        	int total = dto.getTotalSeats(), booked = dto.getBookedSeats();
-        	dto.setOccupancyRate(total == 0 ? 0.0 : (booked * 100.0 / total));
+	        // occupancy rate calculation
+	        int total = dto.getTotalSeats(), booked = dto.getBookedSeats();
+	        dto.setOccupancyRate(total == 0 ? 0.0 : (booked * 100.0 / total));
 
-            // Fetch seat type prices for the show
-            Map<String, Double> prices = showSeatTypePriceDao.findPricesByShowId(dto.getShowId());
-            dto.setSeatTypePrices(prices);
+	        // Fetch seat type prices for the show
+	        Map<String, Double> prices = showSeatTypePriceDao.findPricesByShowId(dto.getShowId());
+	        dto.setSeatTypePrices(prices);
 
-            dtos.add(dto);
-        }
+	        dtos.add(dto);
+	    }
 
-        return dtos;
+	    return dtos;
 	}
 
 	@Override
@@ -123,5 +125,22 @@ public class ShowServiceImpl implements ShowService {
 	public void deactivateShow(Long showId) {
 	    showDao.updateShowStatus(showId, ShowStatus.SCHEDULED);
 	}
+	
+	@Override
+	public TheatreDashboardDTO getOwnerDashboardStats(Long ownerId) {
+		Object[] row = (Object[]) showDao.getOwnerDashboardStats(ownerId);
+
+	    TheatreDashboardDTO dto = new TheatreDashboardDTO();
+	    dto.setPendingTheaters(((Number) row[0]).intValue());
+	    dto.setApprovedTheaters(((Number) row[1]).intValue());
+	    dto.setTotalTheaters(((Number) row[2]).intValue());
+	    dto.setActiveShows(((Number) row[3]).intValue());
+	    dto.setScheduledShows(((Number) row[4]).intValue());
+	    dto.setTotalRevenue(row[5] != null ? ((Number) row[5]).doubleValue() : 0.0); // new mapping
+	    dto.setTodaysBookings(((Number) row[6]).intValue());
+	    dto.setTodaysRevenue(row[7] != null ? ((Number) row[7]).doubleValue() : 0.0);
+
+	    return dto;
+    }
 }
 

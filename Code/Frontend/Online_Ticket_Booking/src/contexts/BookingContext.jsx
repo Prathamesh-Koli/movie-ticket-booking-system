@@ -24,7 +24,7 @@ export const BookingProvider = ({ children }) => {
     setSelectedSeats((prev) => [...prev, { ...seat, status: "selected" }])
   }
   useEffect(() => {
-    axios.get("http://localhost:8080/movies")
+    axios.get("http://localhost:8080/user/movies")
       .then((res) => {
         setMovies(res.data)
       })

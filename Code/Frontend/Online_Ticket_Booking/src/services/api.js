@@ -37,9 +37,14 @@ export const toggleShowStatus = async (showId, newStatus) => {
 }
 
 // Fetch dashboard statistics for a specific theater owner
-export const fetchDashboardStats = async (ownerId) => {
+export const fetchDashboardStats = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/dashboard/${ownerId}`)
+    const token = localStorage.getItem("token")
+    const response = await axios.get(`${BASE_URL}/dashboard/`,{
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
     return response.data
   } catch (error) {
     console.error("Error fetching dashboard stats:", error)

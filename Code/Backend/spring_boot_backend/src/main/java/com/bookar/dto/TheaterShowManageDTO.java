@@ -22,10 +22,11 @@ public class TheaterShowManageDTO {
     private String screenNumber;
     private LocalDate showDate;
     private LocalTime startTime;
-    private Map<String, Double> seatTypePrices; // EXECUTIVE, VIP, PREMIUM
+    private String showStatus;
     private int totalSeats;
     private int bookedSeats;
+    private double revenue;         // Total revenue for this show
+    private double todaysRevenue;   // Revenue for this show today
     private double occupancyRate;
-    private double revenue;
-    private String showStatus;
+    private Map<String, Double> seatTypePrices;
 }

@@ -289,7 +289,7 @@ const TheatreManageShowsPage = () => {
         <Col md={3}>
           <Card className="text-center">
             <Card.Body>
-              <Card.Title className="text-muted">Today's Revenue</Card.Title>
+              <Card.Title className="text-muted">Revenue</Card.Title>
               <Card.Text className="display-6 text-primary">
                 {formatCurrency(shows.active.reduce((sum, show) => sum + show.revenue, 0))}
               </Card.Text>

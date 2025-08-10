@@ -12,6 +12,8 @@ import com.bookar.custom_exceptions.ApiException;
 import com.bookar.custom_exceptions.InvalidCredentialsException;
 import com.bookar.dto.UserApiResponse;
 
+import io.jsonwebtoken.ExpiredJwtException;
+
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -43,4 +45,9 @@ public class GlobalExceptionHandler {
 	    public ResponseEntity<?> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
 	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
 	    }
+		
+		@ExceptionHandler(ExpiredJwtException.class)
+		public ResponseEntity<?> handleExpiredJwtException(ExpiredJwtException ex){
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+		}
 }

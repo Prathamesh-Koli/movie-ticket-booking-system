@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.bookar.dto.MovieDetailDTO;
 import com.bookar.dto.MovieHomeResponseDTO;
@@ -15,10 +14,10 @@ import com.bookar.service.MovieService;
 
 import lombok.AllArgsConstructor;
 
+@CrossOrigin(origins = "http://localhost:5173")
+//@CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/movies")
-//@CrossOrigin(origins = "http://localhost:5173")
-@CrossOrigin(origins = "*")
+@RequestMapping("/user/movies")
 @AllArgsConstructor
 public class MovieController {
 	
@@ -52,7 +51,7 @@ public class MovieController {
         return movieService.getMoviesByGenre(genres);
     }
 
-    @GetMapping("/movies/status/{status}")
+    @GetMapping("/status/{status}")
     public ResponseEntity<List<MovieHomeResponseDTO>> getMoviesByStatus(@PathVariable MovieStatus status) {
         return ResponseEntity.ok(movieService.getMoviesByStatus(status));
     }

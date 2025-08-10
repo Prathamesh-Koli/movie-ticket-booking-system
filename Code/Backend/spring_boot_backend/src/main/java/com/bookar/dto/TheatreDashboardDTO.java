@@ -19,5 +19,6 @@ public class TheatreDashboardDTO {
     private int scheduledShows;
     private int todaysBookings;
     private double todaysRevenue;
+    private double totalRevenue; 
 
 }

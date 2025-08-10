@@ -14,8 +14,8 @@ const HomePage = () => {
         const fetchMovies = async () => {
             try {
                 const [trendingRes, upcomingRes] = await Promise.all([
-                    axios.get("http://localhost:8080/movies/movies/status/TRENDING"),
-                    axios.get("http://localhost:8080/movies/movies/status/UPCOMING"),
+                    axios.get("http://localhost:8080/user/movies/status/TRENDING"),
+                    axios.get("http://localhost:8080/user/movies/status/UPCOMING"),
                 ]);
                 setTrendingMovies(trendingRes.data.slice(0, 4));
                 setUpcomingMovies(upcomingRes.data.slice(0, 4));

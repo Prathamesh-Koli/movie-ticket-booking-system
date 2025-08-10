@@ -114,7 +114,7 @@ const CustomNavbar = () => {
                 </div>
               </div>
             ) : (
-              <Button variant="primary" onClick={() => setShowLoginModal(true)}>
+              <Button variant="primary" onClick={() => navigate("/signin")}>
                 Sign In
               </Button>
             )}
