@@ -24,4 +24,6 @@ public interface ShowSeatTypePriceDao extends JpaRepository<ShowSeatTypePrice, L
         }
         return map;
     }
+
+    List<ShowSeatTypePrice> findByShow(Show show);
 }
