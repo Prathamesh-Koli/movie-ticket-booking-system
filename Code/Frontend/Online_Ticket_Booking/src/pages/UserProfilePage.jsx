@@ -2,9 +2,10 @@ import { useEffect, useState } from "react"
 import { Container, Row, Col, Card, Nav, Button, Form, Badge, Alert } from "react-bootstrap"
 import { User, Calendar, CreditCard, Settings, Ticket, KeyRound } from "lucide-react"
 import userImage from '../assets/9815472.png'
-import { updateUser, updatePassword } from "../services/user"
+import { updateUser, updatePassword, fetchUserDetails } from "../services/user"
 import { toast } from "react-toastify"
-
+import axios from 'axios'
+import { config } from '../services/config'
 // import { useBooking } from "../contexts/BookingContext"
 import { useNavigate } from "react-router-dom"
 
@@ -36,42 +37,45 @@ function UserProfilePage() {
     })
 
     useEffect(() => {
-        const userData = sessionStorage.getItem("user")
-        if (!userData) {
-            setUser(null)
-            return
-        }
-        const parsedUser = JSON.parse(userData)
-        setUser(parsedUser)
+        const fetchDetails = async () => {
+            const userData = await fetchUserDetails()
+            if (userData != null) {
+                // Update state if needed
+                setUser(userData);
 
-        setNewPass({
-            id: parsedUser.id,
-            newPassword: "",
-            oldPassword: ""
-        })
+                setNewPass({
+                    id: userData.id,
+                    newPassword: "",
+                    oldPassword: ""
+                })
 
-        // Initialize profileData with server-fetched values
-        setProfileData({
-            id: parsedUser.id,
-            firstname: parsedUser.firstname,
-            lastname: parsedUser.lastname,
-            email: parsedUser.email,
-            password: parsedUser.password,
-            mobile_no: parsedUser.mobile_no || "",
-            dob: parsedUser.dob || "",
-            gender: parsedUser.gender,
-            address: {
-                addr_line1: parsedUser.address.addr_line1,
-                addr_line2: parsedUser.address.addr_line2,
-                town_city: parsedUser.address.town_city,
-                state: parsedUser.address.state,
-                district: parsedUser.address.district,
-                pincode: parsedUser.address.pincode
+                // Initialize profileData with server-fetched values
+                setProfileData({
+                    id: userData.id,
+                    firstname: userData.firstname,
+                    lastname: userData.lastname,
+                    email: userData.email,
+                    password: userData.password,
+                    mobile_no: userData.mobile_no || "",
+                    dob: userData.dob || "",
+                    gender: userData.gender,
+                    address: {
+                        addr_line1: userData.address.addr_line1,
+                        addr_line2: userData.address.addr_line2,
+                        town_city: userData.address.town_city,
+                        state: userData.address.state,
+                        district: userData.address.district,
+                        pincode: userData.address.pincode
+                    }
+                })
+            } else {
+                toast.error("Failed to Load the User")
             }
-        })
-    }, [])
 
+        };
 
+        fetchDetails();
+    }, []);
 
 
     const handleProfileUpdate = async (e) => {
@@ -114,15 +118,15 @@ function UserProfilePage() {
 
     const changePassword = async (e) => {
         e.preventDefault()
-        const { id , newPassword, oldPassword } = newPass
-        if(oldPassword == newPassword){
+        const { id, newPassword, oldPassword } = newPass
+        if (oldPassword == newPassword) {
             toast.warn("Warning: New Password Must Be Different from Current Password !!!")
-        }else{
+        } else {
             const result = await updatePassword(id, oldPassword, newPassword)
-            if(result.status == 201){
+            if (result.status == 201) {
                 toast.success(`Success: ${result.data.msg}`)
                 navigate("/profile")
-            }else{
+            } else {
                 toast.error(`Error: ${result.data.msg}`)
             }
         }
@@ -131,6 +135,7 @@ function UserProfilePage() {
 
     const logout = () => {
         sessionStorage.removeItem("user")
+        localStorage.removeItem("token")
         navigate("/signin")
     }
 

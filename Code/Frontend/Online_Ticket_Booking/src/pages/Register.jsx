@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { registerUser } from '../services/user'
+import { registerUser, fetchUserDetails } from '../services/user'
 import { toast } from 'react-toastify'
 import {
   Container,
@@ -68,7 +68,7 @@ function Register() {
     if (district.length === 0) return alert('Please enter District')
     if (state.length === 0) return alert('Please enter State')
 
-    const result = await registerUser(
+    const response = await registerUser(
       firstname,
       lastname,
       email,
@@ -84,13 +84,13 @@ function Register() {
       pincode,
       district
     )
-
-    if (result.status === 201) {
-      toast.success(`Welcome to BooKar ${result.data.firstname}!`)
-      sessionStorage.setItem('user', JSON.stringify(result.data))
+    if (response.status === 201) {
+      localStorage.setItem("token",response.data)
+      const user = await fetchUserDetails()
+      toast.success(`Welcome to BooKar, ${user.firstname} !`)
       navigate('/home')
     } else {
-      toast.error(`Error: ${result.data.msg}`)
+      toast.error(`Error: ${response.data.msg}`)
     }
   }
 

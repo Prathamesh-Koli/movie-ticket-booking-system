@@ -15,7 +15,7 @@ const MovieDetailsPage = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/movies/details/${id}`)
+      .get(`http://localhost:8080/user/movies/details/${id}`)
       .then((response) => {
         setMovie(response.data);
         setLoading(false);

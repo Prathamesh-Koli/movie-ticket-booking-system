@@ -3,9 +3,11 @@ package com.bookar.controller;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.bookar.dto.CreateShowDTO;
 import com.bookar.dto.ShowDetailsDTO;
 import com.bookar.dto.TheaterShowDTO;
 import com.bookar.service.ShowService;
@@ -35,5 +37,13 @@ public class ShowController {
     @GetMapping("/{showId}/details")
     public ShowDetailsDTO getShowDetails(@PathVariable Long showId) {
         return showService.getShowDetails(showId);
+    }
+
+    @PostMapping("/theaters/{theaterId}")
+    public ResponseEntity<?> addShow(
+        @PathVariable Long theaterId,
+        @RequestBody CreateShowDTO dto) {
+      showService.createShowWithLayout(theaterId, dto);
+      return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

@@ -4,6 +4,9 @@ import java.util.Optional;
 
 import org.hibernate.type.internal.UserTypeSqlTypeAdapter;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +30,8 @@ import lombok.AllArgsConstructor;
 @Service
 @Transactional
 @AllArgsConstructor
-public class CustomerServiceImpl implements CustomerService {
+public class CustomerServiceImpl implements CustomerService
+{
 	private ModelMapper mapper;
 	private final CustomerDao custDao;
 	private PasswordEncoder passwordEncoder;
@@ -40,7 +44,6 @@ public class CustomerServiceImpl implements CustomerService {
 		User user = mapper.map(newUser, User.class);
 		String hashPassword = passwordEncoder.encode(user.getPassword());
 		user.setPassword(hashPassword);
-		System.out.print(user);
 		return mapper.map(custDao.save(user), UserResponseDTO.class);
 	}
 
@@ -52,15 +55,13 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public UserResponseDTO signIn(SignInDTO details) {
-		System.out.println(details.getEmail());
 		User user = custDao.findByEmail(details.getEmail());
-		System.out.println(user.getAddress());
 		if(user == null)
 			throw new ApiException("Invalid Email !!");
 		    // Check if raw password matches the encoded one
-		    if (!passwordEncoder.matches(details.getPassword(), user.getPassword())) {
+		if (!passwordEncoder.matches(details.getPassword(), user.getPassword())) {
 		        throw new InvalidCredentialsException("Invalid Email or Password !!!");
-		    }
+		}
 
 		    return mapper.map(user, UserResponseDTO.class);
 	}

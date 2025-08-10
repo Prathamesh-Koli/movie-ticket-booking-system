@@ -14,13 +14,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bookar.dto.ApiResponseDTO;
+import com.bookar.dto.LayoutRequestDTO;
+import com.bookar.dto.SeatLayoutResponseDTO;
+import com.bookar.dto.TheaterInfoDTO;
 import com.bookar.dto.TheaterRequestDTO;
 import com.bookar.dto.TheaterResponseDTO;
 import com.bookar.entities.Theater;
 import com.bookar.entities.TheaterStatus;
 import com.bookar.service.TheaterService;
-import lombok.RequiredArgsConstructor;
 
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -53,7 +57,8 @@ public class TheaterController {
             @PathVariable TheaterStatus status) {
         return ResponseEntity.ok(theaterService.updateTheaterStatus(theaterId, status));
     }
-    
+
+    // Owner - Get Theaters by Owner (Approved & Pending)
     @GetMapping("/owner/{ownerId}")
     public ResponseEntity<Map<String, List<Theater>>> getTheatersByOwner(@PathVariable Long ownerId) {
         List<Theater> approved = theaterService.getTheatersByOwnerAndStatus(ownerId, TheaterStatus.APPROVED);
@@ -64,23 +69,46 @@ public class TheaterController {
             "pending", pending
         ));
     }
-    
+
+    // Admin - Get All Theaters
     @GetMapping("/admin/all")
     public ResponseEntity<List<Theater>> getAllTheaters() {
         return ResponseEntity.ok(theaterService.getAllTheaters());
     }
 
+    // Admin - Delete Theater
     @DeleteMapping("/admin/{theaterId}")
     public ResponseEntity<?> deleteTheater(@PathVariable Long theaterId) {
         theaterService.deleteTheater(theaterId);
         return ResponseEntity.ok(Map.of("message", "Theater removed successfully"));
     }
+
+    // Get Theater details with screens
     @GetMapping("/{id}/details")
     public ResponseEntity<TheaterResponseDTO> getTheaterDetails(@PathVariable Long id) {
         return ResponseEntity.ok(theaterService.getTheaterDetails(id));
     }
 
+    // Get Theater info (simple version)
+    @GetMapping("/{id}")
+    public ResponseEntity<TheaterInfoDTO> getTheaterById(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(theaterService.getTheaterById(id));
+    }
 
+    // Save layout for all screens
+    @PostMapping("/{theaterId}/savelayout")
+    public ResponseEntity<ApiResponseDTO> addLayout(
+        @PathVariable Long theaterId,
+        @RequestBody LayoutRequestDTO request
+    ) {
+        theaterService.saveLayoutForAllScreens(theaterId, request.getLayout());
+        return ResponseEntity.ok(new ApiResponseDTO(true, "Layout saved successfully!"));
+    }
 
+    // Get saved layout
+    @GetMapping("/{theaterId}/getlayout")
+    public ResponseEntity<List<SeatLayoutResponseDTO>> getSavedLayout(@PathVariable Long theaterId) {
+        List<SeatLayoutResponseDTO> layout = theaterService.getSavedLayout(theaterId);
+        return ResponseEntity.ok(layout);
+    }
 }
-

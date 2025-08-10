@@ -5,6 +5,9 @@ import com.bookar.dto.TheaterRequestDTO;
 import com.bookar.dto.TheaterResponseDTO;
 import com.bookar.entities.Theater;
 import com.bookar.entities.TheaterStatus;
+import com.bookar.dto.LayoutRequestDTO.SeatLayout;
+import com.bookar.dto.SeatLayoutResponseDTO;
+import com.bookar.dto.TheaterInfoDTO;
 
 public interface TheaterService {
     Theater addTheater(TheaterRequestDTO dto);
@@ -14,5 +17,10 @@ public interface TheaterService {
     Theater updateTheaterStatus(Long theaterId, TheaterStatus status);
     void deleteTheater(Long theaterId);
     TheaterResponseDTO getTheaterDetails(Long theaterId);
+	TheaterInfoDTO getTheaterById(Long theaterId);
+
+	void saveLayoutForAllScreens(Long theaterId, List<SeatLayout> layout);
+
+	List<SeatLayoutResponseDTO> getSavedLayout(Long theaterId);
 
 }

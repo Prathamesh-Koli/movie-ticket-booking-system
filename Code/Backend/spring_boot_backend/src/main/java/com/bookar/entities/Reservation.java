@@ -1,5 +1,6 @@
 package com.bookar.entities;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
@@ -32,6 +33,9 @@ public class Reservation {
 
     @Column(name="expires_at",nullable = false)
     private LocalDateTime expiresAt;
+
+      @Column(name="total_amount" , nullable = false)
+    private BigDecimal totalAmount;
 
     @Enumerated(EnumType.STRING)
     @Column(name="reservation_status",nullable = false)

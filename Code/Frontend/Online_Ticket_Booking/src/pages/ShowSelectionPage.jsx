@@ -22,14 +22,14 @@ const ShowSelectionPage = () => {
 
 
   useEffect(() => {
-    axios.get(`http://localhost:9090/movies/${id}`)
+    axios.get(`http://localhost:8080/movies/${id}`)
       .then(response => setMovie(response.data))
       .catch(console.error);
   }, [id]);
 
 
   useEffect(() => {
-    axios.get(`http://localhost:9090/movies/${id}/locations`)
+    axios.get(`http://localhost:8080/movies/${id}/locations`)
       .then(response => {
         setLocations(response.data);
         setSelectedLocation(response.data[0] || "");
@@ -40,7 +40,7 @@ const ShowSelectionPage = () => {
 
   useEffect(() => {
     if (!selectedLocation || !selectedDate) return;
-    axios.get(`http://localhost:9090/shows/movie/${id}`, {
+    axios.get(`http://localhost:8080/shows/movie/${id}`, {
       params: {
         date: selectedDate,
         location: selectedLocation

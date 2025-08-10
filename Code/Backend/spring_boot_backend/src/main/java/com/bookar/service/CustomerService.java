@@ -10,10 +10,9 @@ import com.bookar.entities.User;
 
 public interface CustomerService {
 	UserResponseDTO signUp(UserRequestDTO newUser);
-	UserResponseDTO getCompleteDetails(String Email);
 	UserResponseDTO signIn(SignInDTO details);
 	User updateDetails(User user);
 	UserResponseDTO getDetailsById(Long id);
 	UserApiResponse updatePassword(updatePasswordDTO newPass);  
-	
+	UserResponseDTO getCompleteDetails(String Email);
 }
