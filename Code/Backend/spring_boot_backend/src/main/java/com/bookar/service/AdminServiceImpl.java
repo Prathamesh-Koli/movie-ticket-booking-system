@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
-
 @Service
 public class AdminServiceImpl implements AdminService {
 
@@ -36,11 +35,8 @@ public class AdminServiceImpl implements AdminService {
         this.modelMapper = modelMapper;
 
     }
-
     @Override
     public DashboardStatsDTO fetchDashboardStats() {
-        DashboardStatsDTO dto = new DashboardStatsDTO();
-        dto.setTotalMovies((int) movieDao.count());
         dto.setTotalUsers((int) userDao.count());
         dto.setTotalTheaters((int) theatreDao.count());
         dto.setTotalBookings((int) bookingDao.count());
