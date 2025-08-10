@@ -34,6 +34,10 @@ import lombok.AllArgsConstructor;
 public class ShowServiceImpl implements ShowService {
 
     private ShowDao showDao;
+    private MovieDao movieDao;
+    private ScreenDao screenDao;
+    private SeatDao seatDao;
+    private ShowSeatDao showSeatDao;
     private ShowSeatTypePriceDao showSeatTypePriceDao;
 
     @Override
