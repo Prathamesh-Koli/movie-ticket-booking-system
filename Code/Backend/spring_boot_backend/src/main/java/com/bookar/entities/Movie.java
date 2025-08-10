@@ -1,6 +1,7 @@
 package com.bookar.entities;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -34,7 +35,6 @@ public class Movie {
 
 	@ElementCollection(targetClass = Genre.class, fetch = FetchType.EAGER)
 	@CollectionTable( name = "movie_genres", joinColumns = @JoinColumn(name = "movie_id"))
-	@Column(name = "genre")
 	@Enumerated(EnumType.STRING)
 	private List<Genre> genres;
 	
@@ -51,8 +51,9 @@ public class Movie {
     @Column(name="trailer_url")
     private String trailerUrl;
     
-    @OneToMany(mappedBy = "movie")
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.REMOVE)
     private List<Show> shows;
+
 
     
     @CreationTimestamp
@@ -68,7 +69,9 @@ public class Movie {
         name = "movie_cast",
         joinColumns = @JoinColumn(name = "movie_id")
     )
-    private List<MovieCast> cast;
+    private List<MovieCast> cast = new ArrayList<>();
+
+
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

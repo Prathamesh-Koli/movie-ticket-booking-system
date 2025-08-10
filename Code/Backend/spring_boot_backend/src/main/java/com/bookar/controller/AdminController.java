@@ -32,4 +32,29 @@ public class AdminController {
     public UserDTO toggleUserStatus(@PathVariable Long id) {
         return adminService.toggleUserStatus(id);
     }
+    @GetMapping("/movies")
+    public List<AdminMovieResponseDTO> getAllMovies() {
+        return adminService.fetchAllMovies();
+    }
+    @GetMapping("/movies/{id}")
+    public AdminMovieResponseDTO getMovieById(@PathVariable Long id) {
+        return adminService.fetchMovieById(id);
+    }
+    @PostMapping("/movies")
+    public AdminMovieResponseDTO addMovie(@RequestBody AdminMovieRequestDTO movieRequestDTO) {
+        return adminService.addMovie(movieRequestDTO);
+    }
+    @PutMapping("/movies/{id}")
+    public AdminMovieResponseDTO updateMovie(
+            @PathVariable Long id,
+            @RequestBody AdminMovieRequestDTO movieRequestDTO
+    ) {
+        return adminService.updateMovie(id, movieRequestDTO);
+    }
+    @DeleteMapping("/movies/{id}")
+    public void deleteMovie(@PathVariable Long id) {
+        adminService.deleteMovie(id);
+    }
+    
+    
 }
