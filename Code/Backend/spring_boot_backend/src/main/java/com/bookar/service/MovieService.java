@@ -1,6 +1,8 @@
 package com.bookar.service;
 
 import java.util.List;
+
+import com.bookar.dto.MovieAddShowDTO;
 import com.bookar.dto.MovieDetailDTO;
 import com.bookar.dto.MovieHomeResponseDTO;
 import com.bookar.dto.MovieResponseDTO;
@@ -14,7 +16,7 @@ public interface MovieService {
 	List<MovieHomeResponseDTO> getAllMovies();
     List<MovieHomeResponseDTO> getMoviesByGenre(List<Genre> genres);
     List<MovieHomeResponseDTO> getMoviesByStatus(MovieStatus status);
-
+    List<MovieAddShowDTO> getAllMoviesForShows();
 
 }
 

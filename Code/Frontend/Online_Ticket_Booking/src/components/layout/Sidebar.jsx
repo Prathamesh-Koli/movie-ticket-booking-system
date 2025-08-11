@@ -4,11 +4,10 @@ const Sidebar = () => {
   const location = useLocation()
 
   const menuItems = [
-    { path: "/admin", label: "Dashboard", icon: "🏠" },
+    { path: "/admin/", label: "Dashboard", icon: "🏠" },
     { path: "/admin/movies", label: "Manage Movies", icon: "🎬" },
     { path: "/admin/theaters", label: "Manage Theaters", icon: "🏛️" },
     { path: "/admin/users", label: "Manage Users", icon: "👥" },
-    { path: "/admin/reports", label: "Generate Reports", icon: "📊" },
   ]
 
   return (

@@ -2,6 +2,7 @@ package com.bookar.controller;
 
 import com.bookar.dto.ReservationRequestDTO;
 import com.bookar.dto.ReservationResponseDTO;
+import com.bookar.dto.SetReservationResp;
 import com.bookar.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +26,8 @@ public class ReservationController {
 
 
 	@PostMapping
-	public ResponseEntity<ReservationResponseDTO> createReservation(@RequestBody ReservationRequestDTO requestDTO) {
-	    ReservationResponseDTO responseDTO = reservationService.reserveSeats(requestDTO);
+	public ResponseEntity<SetReservationResp> createReservation(@RequestBody ReservationRequestDTO requestDTO) {
+	    SetReservationResp responseDTO = reservationService.reserveSeats(requestDTO);
 	    return ResponseEntity.ok(responseDTO);
 	}
 

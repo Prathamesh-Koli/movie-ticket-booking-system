@@ -37,6 +37,8 @@ public class AdminServiceImpl implements AdminService {
     }
     @Override
     public DashboardStatsDTO fetchDashboardStats() {
+        DashboardStatsDTO dto = new DashboardStatsDTO();
+        dto.setTotalMovies((int) movieDao.count());
         dto.setTotalUsers((int) userDao.count());
         dto.setTotalTheaters((int) theatreDao.count());
         dto.setTotalBookings((int) bookingDao.count());

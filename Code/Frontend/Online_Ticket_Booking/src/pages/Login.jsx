@@ -23,7 +23,7 @@ function Login() {
         const token = response.data
         console.log(token)
         localStorage.setItem("token", token);
-        navigate('/profile')
+        navigate('/')
       } else {
         toast.error(`Error: ${response.data.msg}`)
       }

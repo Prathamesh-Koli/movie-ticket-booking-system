@@ -22,14 +22,14 @@ const ShowSelectionPage = () => {
 
 
   useEffect(() => {
-    axios.get(`http://localhost:8080/movies/${id}`)
+    axios.get(`http://localhost:8080/user/movies/${id}`)
       .then(response => setMovie(response.data))
       .catch(console.error);
   }, [id]);
 
 
   useEffect(() => {
-    axios.get(`http://localhost:8080/movies/${id}/locations`)
+    axios.get(`http://localhost:8080/user/movies/${id}/locations`)
       .then(response => {
         setLocations(response.data);
         setSelectedLocation(response.data[0] || "");

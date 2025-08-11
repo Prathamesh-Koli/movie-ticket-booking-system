@@ -24,15 +24,23 @@ import TheaterListPage from "./pages/TheaterListPage"
 import AddTheaterPage from "./pages/AddTheaterPage";
 import TheatreManageShowsPage from './pages/TheatreManageShowPage';
 import TheatreOwnerDashboard from "./pages/TheatreOwnerDashboard";
+import Layout from "./components/layout/Layout";
+import AdminHomepage from "./pages/AdminHomepage";
+import ManageMovies from "./pages/ManageMovies";
+import ManageUsers from "./pages/ManageUsers";
+import CheckoutPage from "./pages/CheckoutPage";
+import { useLocation } from "react-router-dom";
 
 function App() {
+
+  const isAdminRoute = useLocation().pathname.startsWith("/admin");
   return (
-    <ThemeProvider>
+     <ThemeProvider>
       <AuthProvider>
         <BookingProvider>
-          <Router>
+          {/* <Router> */}
             <div className="app">
-              <Navbar />
+              {!isAdminRoute && <Navbar/> }
               <main className="main-content">
                 <Routes>
                   <Route path="/" element={<HomePage />} />
@@ -43,6 +51,7 @@ function App() {
                   <Route path="/signin" element={<Login />} />
                   <Route path="/signup" element={<Register />} />
                   <Route path="/profile" element={<UserProfilePage />} />
+                  <Route path="/checkout" element={<CheckoutPage />} />
                   <Route path="/search" element={<SearchPage />} />
                   <Route path="/owner/add-theater" element={<AddTheaterPage />} />
                   <Route path="/owner/theaters" element={<TheaterListPage />} />
@@ -54,24 +63,21 @@ function App() {
                   <Route path="/terms-of-use" element={<TermsOfUse />} />
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                   <Route path="/about-us" element={<AboutUs />} />
+                  <Route path="/admin/*" element={<Layout />} >
+                    <Route path="" element={<AdminHomepage />} />
+                    <Route path="movies" element={<ManageMovies />} />
+                    <Route path="users" element={<ManageUsers />} />
+                    <Route path="theaters" element={<ManageTheaters />} />
+
+                  </Route>
                 </Routes>
               </main>
-              <Footer />
+               {!isAdminRoute && <Footer/> }
               <ToastContainer />
             </div>
-          </Router>
+          {/* </Router> */}
           {/* admin routes */}
-          <Router>
-            <Layout>
-              <Routes>
-                <Route path="/admin" element={<Homepage />} />
-                <Route path="/admin/movies" element={<ManageMovies />} />
-                <Route path="/admin/theaters" element={<ManageTheaters />} />
-                <Route path="/admin/users" element={<ManageUsers />} />
-                {/* <Route path="/reports" element={<GenerateReports />} /> */}
-              </Routes>
-            </Layout>
-          </Router>
+          {/*  */}
         </BookingProvider>
       </AuthProvider>
     </ThemeProvider>

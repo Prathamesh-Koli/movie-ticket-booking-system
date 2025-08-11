@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Container, Button, Spinner, Row, Col } from "react-bootstrap";
 import { useBooking } from "../contexts/BookingContext";
-const Checkout = () => {
+const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
  // const user= useAuth();
@@ -20,6 +20,7 @@ const Checkout = () => {
       axios
         .get(`http://localhost:8080/api/reservations/${reservationId}`)
         .then((res) => {
+          console.log("Reservation Details:", res.data);
           setReservationDetails(res.data);
         })
         .catch((err) => {
@@ -66,7 +67,7 @@ const Checkout = () => {
 
       const options = {
         key: orderRes.data.key, 
-        amount,
+        amount,// Convert to paise
         currency,
         name: "BookAR Movie Tickets",
         description: "Movie ticket booking",
@@ -139,4 +140,4 @@ const Checkout = () => {
   );
 };
 
-export default Checkout;
+export default CheckoutPage;

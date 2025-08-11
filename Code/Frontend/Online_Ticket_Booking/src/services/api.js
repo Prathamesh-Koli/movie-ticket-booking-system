@@ -60,17 +60,17 @@ export const fetchDashboardStats = async () => {
 }
 
 export const fetchMoviesForShows = async () => {
-  const { data } = await axios.get(`${BASE}/movies/shows`);
+  const { data } = await axios.get(`${BASE}/user/movies/shows`);
   return data;
 };
 
 export const fetchTheaterById = async (theaterId) => {
-  const { data } = await axios.get(`${BASE}/theaters/${theaterId}`);
+  const { data } = await axios.get(`${BASE}/api/theaters/${theaterId}`);
   return data;
 };
 
 export const fetchLayoutByTheaterId = async (theaterId) => {
-  const { data } = await axios.get(`${BASE}/theaters/${theaterId}/getlayout`);
+  const { data } = await axios.get(`${BASE}/api/theaters/${theaterId}/getlayout`);
   return data;
 };
 
@@ -90,7 +90,7 @@ export const addShow = async (theaterId, showData) => {
 
 
 export const addLayout = async (theaterId, layoutRequestDTO) => {
-  const { data } = await axios.post(`${BASE}/theaters/${theaterId}/savelayout`, layoutRequestDTO);
+  const { data } = await axios.post(`${BASE}/api/theaters/${theaterId}/savelayout`, layoutRequestDTO);
   return data;
 };
 

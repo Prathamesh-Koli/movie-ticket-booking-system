@@ -1,5 +1,20 @@
 package com.bookar.dto;
 
+import java.math.BigDecimal;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+
+
+@Getter 
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class PaymentVerificationRequest {
 
     private String razorpayOrderId;
@@ -7,44 +22,7 @@ public class PaymentVerificationRequest {
     private String razorpaySignature;
     private Long reservationId;
     private Long userId;
+    private BigDecimal totalAmount;
 
-    public String getRazorpayOrderId() {
-        return razorpayOrderId;
-    }
-
-    public void setRazorpayOrderId(String razorpayOrderId) {
-        this.razorpayOrderId = razorpayOrderId;
-    }
-
-    public String getRazorpayPaymentId() {
-        return razorpayPaymentId;
-    }
-
-    public void setRazorpayPaymentId(String razorpayPaymentId) {
-        this.razorpayPaymentId = razorpayPaymentId;
-    }
-
-    public String getRazorpaySignature() {
-        return razorpaySignature;
-    }
-
-    public void setRazorpaySignature(String razorpaySignature) {
-        this.razorpaySignature = razorpaySignature;
-    }
-
-    public Long getReservationId() {
-        return reservationId;
-    }
-
-    public void setReservationId(Long reservationId) {
-        this.reservationId = reservationId;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
+   
 }

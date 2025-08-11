@@ -1,5 +1,6 @@
 package com.bookar.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -39,7 +40,7 @@ public class BookingService {
 	@Autowired
 	private BookingDao bookingDao;
 
-	public Long confirmBooking(Long reservationId, Long userId, String paymentId) {//add double payment
+	public Long confirmBooking(Long reservationId, Long userId, String paymentId, BigDecimal totalAmount) {//add double payment
 	    Reservation reservation = reservationDao.findById(reservationId)
 	        .orElseThrow(() -> new RuntimeException("Reservation not found"));
 
@@ -62,6 +63,8 @@ public class BookingService {
 	    booking.setPaymentId(paymentId);
 	    booking.setUser(reservation.getUser());
 	    booking.setReservation(reservation);
+	    
+	    
 
 	    Booking savedBooking = bookingDao.save(booking);
 	    return savedBooking.getBookingId();

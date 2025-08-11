@@ -1,23 +1,22 @@
 package com.bookar.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import com.bookar.entities.ShowSeat;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
 @Getter
 @Setter
 @AllArgsConstructor
-public class ReservationRequestDTO {
-    private Long showId;
-    private Long userId;
-    private List<Long> showSeatIds;  
-    private BigDecimal totalAmount;
+@NoArgsConstructor
+public class SetReservationResp {
+	private Long reservationId;
+    
 }
-
-
-
-

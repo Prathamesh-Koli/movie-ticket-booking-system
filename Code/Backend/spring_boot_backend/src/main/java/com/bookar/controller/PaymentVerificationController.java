@@ -43,7 +43,7 @@ public class PaymentVerificationController {
             }
 
             // ✅ Get the bookingId from service
-            Long bookingId = bookingService.confirmBooking(req.getReservationId(), req.getUserId(), req.getRazorpayPaymentId());
+            Long bookingId = bookingService.confirmBooking(req.getReservationId(), req.getUserId(), req.getRazorpayPaymentId(),req.getTotalAmount());
 
             // ✅ Return as DTO
             return ResponseEntity.ok(new PaymentVerificationResponse(bookingId));
