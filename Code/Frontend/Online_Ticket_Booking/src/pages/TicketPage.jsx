@@ -6,6 +6,8 @@ import '../styles/TicketPage.css'
 
 const TicketPage = () => {
   const { bookingId } = useParams()
+  console.log("Booking ID:", bookingId);
+
   const navigate = useNavigate()
   const [ticket, setTicket] = useState(null)
   const [loading, setLoading] = useState(true)
