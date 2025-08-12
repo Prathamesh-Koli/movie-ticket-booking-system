@@ -3,7 +3,7 @@ package com.bookar.controller;
 import com.bookar.dto.ReservationRequestDTO;
 import com.bookar.dto.ReservationResponseDTO;
 import com.bookar.dto.SeatResponseDTO;
-import com.bookar.dto.SetReservationResp;
+import com.bookar.dto.SeatReservationResp;
 import com.bookar.service.ReservationService;
 import com.bookar.service.SeatService;
 
@@ -32,8 +32,8 @@ public class SeatSelectionController {
     }
 
     @PostMapping("/reserve")
-    public ResponseEntity<SetReservationResp> reserveSeats( @RequestBody ReservationRequestDTO req) {
-        SetReservationResp res = reservationService.reserveSeats(req);
+    public ResponseEntity<SeatReservationResp> reserveSeats( @RequestBody ReservationRequestDTO req) {
+        SeatReservationResp res = reservationService.reserveSeats(req);
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
 }

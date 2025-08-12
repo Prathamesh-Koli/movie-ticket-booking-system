@@ -102,14 +102,14 @@ public class SeatServiceImpl implements SeatService {
 
     @Override
     public List<SeatResponseDTO> getSeatsForShow(Long showId, Long theaterId) {
-        // expire old reservations first
+       
         reservationService.expireOldReservations();
 
-        // fetch show
+        
         Show show = showDao.findById(showId)
                 .orElseThrow(() -> new ResourceNotFoundException("Show not found"));
 
-        // derive screenId from the show (preferred over using theaterId)
+       
         Long screenId = (show.getScreen() != null) ? show.getScreen().getScreenId() : null;
         if (screenId == null) {
             log.error("Screen not found for showId={}", showId);
@@ -118,12 +118,11 @@ public class SeatServiceImpl implements SeatService {
 
         log.info("getSeatsForShow called: showId={}, derivedScreenId={}, passedTheaterId={}", showId, screenId, theaterId);
 
-        // fetch show seats for the show and screen
-        // (ensure your ShowSeatDao method actually fetches seats; see DAO suggestion below)
+       
         List<ShowSeat> showSeat = showSeatDao.findByShowAndSeat_Screen_ScreenId(show, screenId);
         log.info("Found {} show seats for showId={} screenId={}", showSeat.size(), showId, screenId);
 
-        // fetch seat type prices for the show
+      
         List<ShowSeatTypePrice> showSeatPrices = priceDao.findByShow(show);
 
         Map<SeatType, Double> seatPriceMap = new HashMap<>();
@@ -131,7 +130,7 @@ public class SeatServiceImpl implements SeatService {
             seatPriceMap.put(s.getSeatType(), s.getPrice());
         }
 
-        // map to DTOs
+    
         return showSeat.stream().map(ss -> {
             SeatResponseDTO dto = new SeatResponseDTO();
             dto.setShowSeatId(ss.getShowSeatId());

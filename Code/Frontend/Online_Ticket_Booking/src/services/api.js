@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const BASE_URL = 'http://localhost:8080/user' // Adjust as per backend
+// const BASE_URL = 'http://localhost:8080/user' 
 
 const BASE = "http://localhost:8080";
 
@@ -8,7 +8,7 @@ const BASE = "http://localhost:8080";
 export const fetchOwnerShows = async () => {
   try {
     const token = localStorage.getItem("token")
-    const response = await axios.get(`${BASE_URL}/shows/manage/`,{
+    const response = await axios.get(`${BASE}/user/shows/manage/`,{
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -23,7 +23,7 @@ export const fetchOwnerShows = async () => {
 // Delete a show by ID
 export const deleteShow = async (showId) => {
   try {
-    const response = await axios.delete(`${BASE_URL}/${showId}`)
+    const response = await axios.delete(`${BASE}/user/${showId}`)
     return { success: true, message: response.data }
   } catch (error) {
     console.error("Error deleting show:", error)
@@ -34,7 +34,7 @@ export const deleteShow = async (showId) => {
 // Toggle show status (ACTIVE / SCHEDULED)
 export const toggleShowStatus = async (showId, newStatus) => {
   try {
-    const url = `${BASE_URL}/${showId}/${newStatus === "ACTIVE" ? "activate" : "deactivate"}`
+    const url = `${BASE}/user/${showId}/${newStatus === "ACTIVE" ? "activate" : "deactivate"}`
     const response = await axios.put(url)
     return { success: true, message: response.data }
   } catch (error) {
@@ -47,7 +47,7 @@ export const toggleShowStatus = async (showId, newStatus) => {
 export const fetchDashboardStats = async () => {
   try {
     const token = localStorage.getItem("token")
-    const response = await axios.get(`${BASE_URL}/dashboard/`, {
+    const response = await axios.get(`${BASE}/user/dashboard/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

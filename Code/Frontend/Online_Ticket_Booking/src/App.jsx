@@ -31,6 +31,7 @@ import ManageUsers from "./pages/ManageUsers";
 import CheckoutPage from "./pages/CheckoutPage";
 import { useLocation } from "react-router-dom";
 
+
 function App() {
 
   const isAdminRoute = useLocation().pathname.startsWith("/admin");
