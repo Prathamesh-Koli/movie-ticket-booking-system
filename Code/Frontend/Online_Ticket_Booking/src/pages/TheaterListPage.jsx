@@ -11,12 +11,17 @@ const TheaterListPage = () => {
   const [activeTab, setActiveTab] = useState("approved")
   const navigate = useNavigate()
 
-  const ownerId = 1 // Hardcoded or get from user context/session
+  const ownerId = 5 // Hardcoded or get from user context/session
 
   useEffect(() => {
     const loadTheaters = async () => {
       try {
-        const res = await axios.get(`http://localhost:8080/api/theaters/owner/${ownerId}`)
+        const token = localStorage.getItem("token")
+        const res = await axios.get(`http://localhost:8080/api/theaters/owner/${ownerId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
         setTheaters(res.data)
       } catch (error) {
         console.error("Error loading theaters:", error)

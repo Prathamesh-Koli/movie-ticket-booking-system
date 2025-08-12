@@ -22,14 +22,14 @@ const ShowSelectionPage = () => {
 
 
   useEffect(() => {
-    axios.get(`http://localhost:8080/movies/${id}`)
+    axios.get(`http://localhost:8080/user/movies/${id}`)
       .then(response => setMovie(response.data))
       .catch(console.error);
   }, [id]);
 
 
   useEffect(() => {
-    axios.get(`http://localhost:8080/movies/${id}/locations`)
+    axios.get(`http://localhost:8080/user/movies/${id}/locations`)
       .then(response => {
         setLocations(response.data);
         setSelectedLocation(response.data[0] || "");
@@ -149,7 +149,7 @@ const ShowSelectionPage = () => {
                         <Button
                           key={show.showId}
                           variant={!show.isAvailable ? "outline-primary" : "outline-secondary"}
-                          
+
                           size="sm"
                           disabled={show.isAvailable}
                           onClick={() => handleShowSelect(theater.theaterId, show.showId)}
@@ -159,8 +159,8 @@ const ShowSelectionPage = () => {
                           <div className="d-flex align-items-center mb-1">
                             <Clock size={14} className="me-1" />
                             <small className="fw-semibold text-success" style={{ fontSize: "1rem" }}>
-  {show.startTime}
-</small>
+                              {show.startTime}
+                            </small>
 
 
 

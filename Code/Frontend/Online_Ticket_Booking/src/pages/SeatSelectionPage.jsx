@@ -28,7 +28,7 @@ const SeatSelectionPage = () => {
 
 
   useEffect(() => {
-    axios.get(`http://localhost:8080/movies/${id}`)
+    axios.get(`http://localhost:8080/user/movies/${id}`)
       .then((res) => setMovie(res.data))
       .catch((err) => {
         console.error(err)
