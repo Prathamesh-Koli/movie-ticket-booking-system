@@ -102,6 +102,7 @@ import LayoutPage from "./pages/LayoutPage"
 import AboutUs from "./pages/AboutUs";
 import TheatreManageShowsPage from './pages/TheatreManageShowPage';
 
+
 function App() {
   return (
     <ThemeProvider>

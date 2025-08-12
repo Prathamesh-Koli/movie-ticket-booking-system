@@ -18,6 +18,7 @@ import com.bookar.dao.ShowDao;
 import com.bookar.dao.ShowSeatDao;
 import com.bookar.dto.ReservationRequestDTO;
 import com.bookar.dto.ReservationResponseDTO;
+import com.bookar.dto.SeatReservationResp;
 import com.bookar.entities.Reservation;
 import com.bookar.entities.ReservationSeat;
 import com.bookar.entities.ReservationStatus;
@@ -41,7 +42,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final CustomerDao customerDao;
 
     @Override
-    public ReservationResponseDTO reserveSeats(ReservationRequestDTO req) {
+    public SeatReservationResp reserveSeats(ReservationRequestDTO req) {
     	
         Show show = showDao.findById(req.getShowId())
             .orElseThrow(() -> new ResourceNotFoundException("Show not found: " + req.getShowId()));
@@ -61,6 +62,11 @@ public class ReservationServiceImpl implements ReservationService {
             selectedSeats.add(ss);
             ticketAmount = ticketAmount.add(BigDecimal.valueOf(ss.getSeat().getPrice()));
         }
+        
+        
+
+        BigDecimal total = req.getTotalAmount();
+        		System.out.println(total);
 
         
         Reservation reservation = new Reservation();
@@ -79,27 +85,15 @@ public class ReservationServiceImpl implements ReservationService {
             reservationSeatDao.save(rs);
         }
         
-        List<Long> showSeatIds = new ArrayList<>();
-        for (ShowSeat seat : selectedSeats) {
-            showSeatIds.add(seat.getShowSeatId());
-        }
         
         ticketAmount = ticketAmount.setScale(2, RoundingMode.HALF_UP);
         BigDecimal fee = ticketAmount.multiply(BigDecimal.valueOf(0.10)).setScale(2, RoundingMode.HALF_UP);
         BigDecimal total = ticketAmount.add(fee).setScale(2, RoundingMode.HALF_UP);
         
-        ReservationResponseDTO dto = new ReservationResponseDTO();
+        
+        SeatReservationResp dto = new SeatReservationResp();
         dto.setReservationId(reservation.getReservationId());
-        dto.setUserId(user.getId());
-        dto.setShowId(show.getShowId());
-        dto.setTheaterId(show.getScreen().getTheater().getTheaterId());
-        dto.setShowSeatIds(showSeatIds);
-        dto.setReservedAt(reservation.getReservedAt());
-        dto.setExpiresAt(reservation.getExpiresAt());
-        dto.setReservationStatus(reservation.getReservationStatus().name());
-        dto.setTicketAmount(ticketAmount);
-        dto.setConvenienceFee(fee);
-        dto.setTotalPayable(total);
+
 
         return dto;
     }
@@ -128,5 +122,57 @@ public class ReservationServiceImpl implements ReservationService {
                 showSeat.setSeatStatus(SeatStatus.AVAILABLE);
                 showSeatDao.save(showSeat);
             });
+    }
+    
+    @Override
+    public ReservationResponseDTO getReservationById(Long id) {
+        Optional<Reservation> optionalReservation = reservationDao.findById(id);
+
+        if (!optionalReservation.isPresent()) {
+            throw new RuntimeException("Reservation not found with ID: " + id);
+        }
+
+        Reservation reservation = optionalReservation.get();
+        Show show = reservation.getShow();
+
+      
+        Map<SeatType, Double> priceMap = priceDao.findByShow(reservation.getShow())
+        	    .stream()
+        	    .collect(Collectors.toMap(ShowSeatTypePrice::getSeatType, ShowSeatTypePrice::getPrice));
+
+        	BigDecimal ticketAmount = reservation.getReservationSeats()
+        	    .stream()
+        	    .map(rs -> BigDecimal.valueOf(priceMap.get(rs.getShowSeat().getSeat().getType())))
+        	    .reduce(BigDecimal.ZERO, BigDecimal::add)
+        	    .setScale(2, RoundingMode.HALF_UP);
+
+        System.out.println(ticketAmount);
+        BigDecimal fee = ticketAmount.multiply(BigDecimal.valueOf(0.10)).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal total = ticketAmount.add(fee).setScale(2, RoundingMode.HALF_UP);
+        reservation.setTotalAmount(total);
+        reservationDao.save(reservation);
+
+        ReservationResponseDTO dto = new ReservationResponseDTO();
+        dto.setReservationId(reservation.getReservationId()); 
+        dto.setUserId(reservation.getUser().getId());
+        dto.setShowId(reservation.getShow().getShowId());
+        dto.setTheaterId(reservation.getShow().getScreen().getTheater().getTheaterId());
+        dto.setShowSeatIds(
+            reservation.getReservationSeats()
+                .stream()
+                .map(seat -> seat.getShowSeat().getShowSeatId())
+                .collect(Collectors.toList())
+        );
+        dto.setReservedAt(reservation.getReservedAt());
+        dto.setExpiresAt(reservation.getExpiresAt());
+        dto.setReservationStatus(reservation.getReservationStatus().name());
+        dto.setTotalAmount(ticketAmount);
+        dto.setConvenienceFee(fee);
+        dto.setTotalPayable(total);
+        dto.setMovieName(show.getMovie().getTitle()); 
+        dto.setTheaterName(show.getScreen().getTheater().getTheaterName());
+        dto.setShowTime(show.getStartTime());
+        System.out.println(dto);
+        return dto;
     }
 }

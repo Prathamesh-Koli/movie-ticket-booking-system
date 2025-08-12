@@ -1,13 +1,18 @@
 import axios from 'axios'
 
-const BASE_URL = 'http://localhost:8080/user' // Adjust as per backend
+// const BASE_URL = 'http://localhost:8080/user' 
 
 const BASE = "http://localhost:8080";
 
 // Fetch shows for a specific theater owner
 export const fetchOwnerShows = async (ownerId) => {
   try {
-    const response = await axios.get(`${BASE_URL}/shows/manage/${ownerId}`)
+    const token = localStorage.getItem("token")
+    const response = await axios.get(`${BASE}/user/shows/manage/`,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
     return response.data
   } catch (error) {
     console.error("Error fetching shows:", error)
@@ -18,7 +23,7 @@ export const fetchOwnerShows = async (ownerId) => {
 // Delete a show by ID
 export const deleteShow = async (showId) => {
   try {
-    const response = await axios.delete(`${BASE_URL}/${showId}`)
+    const response = await axios.delete(`${BASE}/user/${showId}`)
     return { success: true, message: response.data }
   } catch (error) {
     console.error("Error deleting show:", error)
@@ -29,7 +34,7 @@ export const deleteShow = async (showId) => {
 // Toggle show status (ACTIVE / SCHEDULED)
 export const toggleShowStatus = async (showId, newStatus) => {
   try {
-    const url = `${BASE_URL}/${showId}/${newStatus === "ACTIVE" ? "activate" : "deactivate"}`
+    const url = `${BASE}/user/${showId}/${newStatus === "ACTIVE" ? "activate" : "deactivate"}`
     const response = await axios.put(url)
     return { success: true, message: response.data }
   } catch (error) {
@@ -41,7 +46,12 @@ export const toggleShowStatus = async (showId, newStatus) => {
 // Fetch dashboard statistics for a specific theater owner
 export const fetchDashboardStats = async (ownerId) => {
   try {
-    const response = await axios.get(`${BASE_URL}/dashboard/${ownerId}`)
+    const token = localStorage.getItem("token")
+    const response = await axios.get(`${BASE}/user/dashboard/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
     return response.data
   } catch (error) {
     console.error("Error fetching dashboard stats:", error)

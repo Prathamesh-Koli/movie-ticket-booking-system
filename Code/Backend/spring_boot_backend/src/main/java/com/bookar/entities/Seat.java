@@ -21,7 +21,7 @@ public class Seat {
     @Column(name="seat_id")
     private Long seatId;
 
-    @Column(name="row_lable",nullable = false)
+    @Column(name="row_label",nullable = false)
     private String rowLabel;
 
     @Column(name="seat_number",nullable = false)
@@ -30,9 +30,6 @@ public class Seat {
     @Enumerated(EnumType.STRING)
     @Column(name="seat_type",nullable = false)
     private SeatType type;      
-
-    @Column(name="seat_price",nullable = false)
-    private double price;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "screen_id", nullable = false)

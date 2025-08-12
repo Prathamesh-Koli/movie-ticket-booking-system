@@ -34,18 +34,50 @@ public class SeatServiceImpl implements SeatService {
 		            .orElseThrow(() -> new ResourceNotFoundException("Show not found"));
 		        List<ShowSeat> showSeat = showSeatDao.findByShowAndSeat_Screen_ScreenId(show, theaterId);
 
-		        return showSeat.stream().map(ss -> {
-		        	SeatResponseDTO dto = new SeatResponseDTO();
-		        	dto.setShowSeatId(ss.getShowSeatId());
-		            Seat s = ss.getSeat();
-		            dto.setId(s.getRowLabel() + s.getSeatNumber());
-		            dto.setRow(s.getRowLabel());
-		            dto.setNumber(s.getSeatNumber());
-		            dto.setType(s.getType());
-		            dto.setPrice(s.getPrice());
-		            dto.setStatus(ss.getSeatStatus().name().toLowerCase());
-		            return dto;
-		        }).collect(Collectors.toList());
+    @Override
+    public List<SeatResponseDTO> getSeatsForShow(Long showId, Long theaterId) {
+       
+        reservationService.expireOldReservations();
+
+        
+        Show show = showDao.findById(showId)
+                .orElseThrow(() -> new ResourceNotFoundException("Show not found"));
+
+       
+        Long screenId = (show.getScreen() != null) ? show.getScreen().getScreenId() : null;
+        if (screenId == null) {
+            log.error("Screen not found for showId={}", showId);
+            throw new ResourceNotFoundException("Screen for show not found");
+        }
+
+        log.info("getSeatsForShow called: showId={}, derivedScreenId={}, passedTheaterId={}", showId, screenId, theaterId);
+
+       
+        List<ShowSeat> showSeat = showSeatDao.findByShowAndSeat_Screen_ScreenId(show, screenId);
+        log.info("Found {} show seats for showId={} screenId={}", showSeat.size(), showId, screenId);
+
+      
+        List<ShowSeatTypePrice> showSeatPrices = priceDao.findByShow(show);
+
+        Map<SeatType, Double> seatPriceMap = new HashMap<>();
+        for (ShowSeatTypePrice s : showSeatPrices) {
+            seatPriceMap.put(s.getSeatType(), s.getPrice());
+        }
+
+    
+        return showSeat.stream().map(ss -> {
+            SeatResponseDTO dto = new SeatResponseDTO();
+            dto.setShowSeatId(ss.getShowSeatId());
+            Seat s = ss.getSeat();
+            SeatType seatType = s.getType();
+            dto.setId(s.getRowLabel() + s.getSeatNumber());
+            dto.setRow(s.getRowLabel());
+            dto.setNumber(s.getSeatNumber());
+            dto.setType(s.getType());
+            dto.setPrice(seatPriceMap.getOrDefault(seatType, 0.0));
+            dto.setStatus(ss.getSeatStatus().name().toLowerCase());
+            return dto;
+        }).collect(Collectors.toList());
     }
 	
 
