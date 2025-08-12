@@ -65,14 +65,14 @@ const SeatSelectionPage = () => {
        
         console.log("Fetched seat data (flat):", flat);
 
-       
+      
         const grouped = flat.reduce((acc, s) => {
           if (!acc[s.row]) acc[s.row] = [];
           acc[s.row].push(s);
           return acc;
         }, {});
 
-       
+     
         const rows2D = Object.keys(grouped)
           .sort()
           .map((r) => grouped[r]);
