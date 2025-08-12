@@ -9,6 +9,7 @@ export async function loginUser(email, password) {
             email, password
         }
         const response = await axios.post(url, body)
+        console.log(response)
         return response
     } catch (error) {
         return error.response

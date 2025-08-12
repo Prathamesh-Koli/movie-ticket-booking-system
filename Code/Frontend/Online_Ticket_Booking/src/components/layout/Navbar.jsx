@@ -9,10 +9,11 @@ import axios from "axios"
 
 
 const CustomNavbar = () => {
-  const { user, logout, setShowLoginModal } = useAuth()
+  const { logout, setShowLoginModal } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
   const [query, setQuery] = useState("")
+  const user = JSON.parse(sessionStorage.getItem("user"))
 
   const handleSearchSubmit = async (e) => {
     e.preventDefault()
@@ -22,6 +23,7 @@ const CustomNavbar = () => {
 
 
   const handleProfileClick = () => {
+    
     if (user) {
       if (user.role === "admin") {
         navigate("/admin")
@@ -113,7 +115,7 @@ const CustomNavbar = () => {
               <div className="dropdown">
                 <Button variant="outline-primary" className="d-flex align-items-center" onClick={handleProfileClick}>
                   <User size={18} className="me-2" />
-                  {user.name}
+                  {user.firstname}
                 </Button>
                 <div className="dropdown-menu">
                   <button className="dropdown-item" onClick={() => navigate("/profile")}>

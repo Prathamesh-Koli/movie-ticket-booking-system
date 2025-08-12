@@ -119,7 +119,7 @@ const SeatSelectionPage = () => {
     try {
       const payload = {
         showId: parseInt(showId),
-        userId: 100, // TODO: replace with actual user ID from auth context
+        userId: 1, // TODO: replace with actual user ID from auth context
         showSeatIds: selectedSeats.map((s) => s.showSeatId),
         totalAmount,
       };

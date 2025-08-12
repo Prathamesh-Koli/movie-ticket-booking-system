@@ -22,7 +22,7 @@ public interface CustomerDao extends JpaRepository<User, Long> {
 	            r.reserved_at AS bookingDate,
 	            sh.start_time AS showTime,
 	            st.seat_id AS seatId,
-	            st.row_lable AS rowLabel,
+	            st.row_label AS rowLabel,
 	            st.seat_number AS seatNumber,
 	            r.total_amount AS totalAmount,
 	            r.reservation_status AS status
@@ -35,7 +35,7 @@ public interface CustomerDao extends JpaRepository<User, Long> {
 	        JOIN show_seats ss ON rs.show_seat_id = ss.show_seat_id
 	        JOIN seats st ON ss.seat_id = st.seat_id
 	        WHERE r.user_id = :userId
-	        ORDER BY r.reservation_id, st.row_lable, st.seat_number
+	        ORDER BY r.reservation_id, st.row_label, st.seat_number
 	    """, nativeQuery = true)
 	    List<Object[]> findBookingsByUserId(@Param("userId") Long userId);
 	
