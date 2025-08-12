@@ -62,17 +62,17 @@ const SeatSelectionPage = () => {
         setLoading(true);
         const flat = await fetchSeatsForShow(showId, theaterId);
 
-        // DEBUG: uncomment to inspect what backend returned
+       
         console.log("Fetched seat data (flat):", flat);
 
-        // Group by row -> produce 2D array
+      
         const grouped = flat.reduce((acc, s) => {
           if (!acc[s.row]) acc[s.row] = [];
           acc[s.row].push(s);
           return acc;
         }, {});
 
-        // sort rows (NOTE: this is lexicographic sort like original code)
+     
         const rows2D = Object.keys(grouped)
           .sort()
           .map((r) => grouped[r]);
