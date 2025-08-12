@@ -30,7 +30,7 @@ import ManageMovies from "./pages/ManageMovies";
 import ManageUsers from "./pages/ManageUsers";
 import CheckoutPage from "./pages/CheckoutPage";
 import { useLocation } from "react-router-dom";
-
+import TicketPage from "./pages/TicketPage";
 
 function App() {
 
@@ -53,6 +53,7 @@ function App() {
                   <Route path="/signup" element={<Register />} />
                   <Route path="/profile" element={<UserProfilePage />} />
                   <Route path="/checkout" element={<CheckoutPage />} />
+                  <Route path="/ticket/:bookingId" element={<TicketPage />} />
                   <Route path="/search" element={<SearchPage />} />
                   <Route path="/owner/add-theater" element={<AddTheaterPage />} />
                   <Route path="/owner/theaters" element={<TheaterListPage />} />
