@@ -10,6 +10,7 @@ import com.bookar.dao.ShowDao;
 import com.bookar.dto.MovieDetailDTO;
 import com.bookar.dto.MovieHomeResponseDTO;
 import com.bookar.dto.MovieResponseDTO;
+import com.bookar.dto.MovieAddShowDTO;
 import com.bookar.dto.MovieCastDTO;
 import com.bookar.entities.Genre;
 import com.bookar.entities.Movie;
@@ -71,4 +72,11 @@ public class MovieServiceImpl implements MovieService {
 		return movieDao.findByStatus(status).stream().map(movie -> modelMapper.map(movie, MovieHomeResponseDTO.class))
 				.collect(Collectors.toList());
 	}
+	@Override
+	public List<MovieAddShowDTO> getAllMoviesForShows() {
+	    return movieDao.findAll().stream()
+	        .map(m -> new MovieAddShowDTO(m.getMovieId(), m.getTitle(), m.getDuration()))
+	        .collect(Collectors.toList());
+	}
+
 }

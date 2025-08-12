@@ -100,7 +100,7 @@ const CustomNavbar = () => {
               variant={theme === "light" ? "outline-dark" : "outline-light"}
               size="sm"
               className="me-3"
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/admin/")}
             >
               Home
             </Button>

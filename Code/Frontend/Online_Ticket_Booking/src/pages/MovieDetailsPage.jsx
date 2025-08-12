@@ -58,7 +58,7 @@ const MovieDetailsPage = () => {
     return (
       <Container className="py-5 text-center">
         <Alert variant="danger">{error}</Alert>
-        <Button variant="primary" onClick={() => navigate("/")}>
+        <Button variant="primary" onClick={() => navigate("")}>
           Back to Home
         </Button>
       </Container>

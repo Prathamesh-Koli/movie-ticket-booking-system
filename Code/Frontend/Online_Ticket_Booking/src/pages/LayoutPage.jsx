@@ -141,7 +141,7 @@ const LayoutPage = () => {
         // status: seat.status,
       }))
 
-      const result = await addLayout(/*theaterId*/5, { layout: layoutData })
+      const result = await addLayout(theaterId, { layout: layoutData })
       setAlert({ type: "success", message: result.message })
 
       setTimeout(() => {

@@ -88,7 +88,7 @@ function Register() {
       localStorage.setItem("token",response.data)
       const user = await fetchUserDetails()
       toast.success(`Welcome to BooKar, ${user.firstname} !`)
-      navigate('/home')
+      navigate('/')
     } else {
       toast.error(`Error: ${response.data.msg}`)
     }

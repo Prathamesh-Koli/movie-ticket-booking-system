@@ -2,6 +2,7 @@ package com.bookar.entities;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -40,5 +41,9 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     @Column(name="reservation_status",nullable = false)
     private ReservationStatus reservationStatus; 
+    
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReservationSeat> reservationSeats = new java.util.ArrayList<>();
+
 }
 
