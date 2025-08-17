@@ -21,7 +21,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class ShowController {
 
-   
+ 
     private ShowService showService;
 
     @GetMapping("/movie/{movieId}")

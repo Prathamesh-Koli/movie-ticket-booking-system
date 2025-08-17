@@ -9,7 +9,8 @@ import axios from "axios"
 
 
 const CustomNavbar = () => {
-  const { logout, setShowLoginModal } = useAuth()
+  const {  logout, setShowLoginModal } = useAuth()
+  const user = sessionStorage.getItem("user")
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
   const [query, setQuery] = useState("")

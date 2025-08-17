@@ -1,6 +1,6 @@
 package com.bookar.controller;
 
-import com.bookar.dto.ReservationRequestDTO;
+
 import com.bookar.dto.ReservationResponseDTO;
 import com.bookar.dto.SeatResponseDTO;
 import com.bookar.dto.SeatReservationResp;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class SeatSelectionController {
     
     private final SeatService seatService;
-    private final ReservationService reservationService;
+    
 
    
     @GetMapping("/show/{showId}")
@@ -31,10 +31,6 @@ public class SeatSelectionController {
         return ResponseEntity.ok(seats);
     }
 
-    @PostMapping("/reserve")
-    public ResponseEntity<SeatReservationResp> reserveSeats( @RequestBody ReservationRequestDTO req) {
-        SeatReservationResp res = reservationService.reserveSeats(req);
-        return ResponseEntity.status(HttpStatus.CREATED).body(res);
-    }
+    
 }
    

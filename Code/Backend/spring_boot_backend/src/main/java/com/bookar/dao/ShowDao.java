@@ -157,5 +157,8 @@ public interface ShowDao extends JpaRepository<Show, Long> {
 	@Modifying
 	@Query("UPDATE Show s SET s.showStatus = :status WHERE s.id = :showId")
 	void updateShowStatus(@Param("showId") Long showId, @Param("status") ShowStatus status);
+	
+
+	List<Show> findByScreen_ScreenIdAndShowDate(Long screenId, LocalDate showDate);
 
 }

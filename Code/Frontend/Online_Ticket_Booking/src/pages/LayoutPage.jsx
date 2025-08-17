@@ -24,18 +24,36 @@ const LayoutPage = () => {
     EXECUTIVE: { label: "Executive", color: "#28a745" },
     PREMIUM: { label: "Premium", color: "#ffc107" },
     VIP: { label: "VIP", color: "#dc3545" },
-    DISABLED: { label: "Disabled", color: "#6c757d" },
   }
 
   useEffect(() => {
+    const loadTheater = async () => {
+      try {
+        const theaterData = await fetchTheaterById(theaterId)
+        setTheater(theaterData)
+      } catch (error) {
+        console.error("Error loading theater:", error)
+        setAlert({ type: "danger", message: "Failed to load theater data" })
+      } finally {
+        setLoading(false)
+      }
+    }
+  
+    loadTheater()
+  }, [theaterId])
+
+  useEffect(() => {
     const loadLayout = async () => {
+      try{
       const data = await fetchLayoutByTheaterId(theaterId);
       setLayoutData(data);
+      } catch(error){
+        setAlert({ type: "danger", message: "Failed to load saved layout" })
+      }
     };
 
     loadLayout();
   }, [theaterId]);
-
 
   const getMaxRow = (layout) => {
     const rowLabels = layout
@@ -49,39 +67,25 @@ const LayoutPage = () => {
     return Math.max(...layout.map((s) => s.seatNumber))
   }
 
-
-
   useEffect(() => {
-    const loadTheater = async () => {
-      try {
-        const theaterData = await fetchTheaterById(theaterId)
-        setTheater(theaterData)
-        if (layoutData?.length > 0) {
-          setRows(getMaxRow(layoutData))
-          setColumns(getMaxColumn(layoutData))
-          setSeats(
-            
-
-            layoutData.map((seat) => ({
-              id: `${seat.rowLabel}-${seat.seatNumber}`,
-              rowLabel: seat.rowLabel,
-              seatNumber: seat.seatNumber,
-              type: seat.type,
-            }))
-          )
-        } else {
-          generateInitialLayout(10, 12)
-        }
-      } catch (error) {
-        console.error("Error loading theater:", error)
-        setAlert({ type: "danger", message: "Failed to load theater data" })
-      } finally {
-        setLoading(false)
-      }
+    if (layoutData && layoutData.length > 0) {
+      setRows(getMaxRow(layoutData))
+      setColumns(getMaxColumn(layoutData))
+      setSeats(
+        layoutData.map((seat) => ({
+          id: `${seat.rowLabel}-${seat.seatNumber}`,
+          row: seat.rowLabel,       
+          number: seat.seatNumber,   
+          type: (seat.seatType || "EXECUTIVE").toString().toUpperCase(),
+        }))
+      )
+    } else {
+     
+      generateInitialLayout(10, 20)
     }
+  }, [layoutData])
 
-    loadTheater()
-  }, [theaterId])
+
 
   const generateRowLabel = (index) => {
     return String.fromCharCode(65 + index) // A, B, C, etc.
@@ -96,7 +100,7 @@ const LayoutPage = () => {
           row: generateRowLabel(r),
           number: c + 1,
           type: "EXECUTIVE",
-          status: "AVAILABLE",
+         
         })
       }
     }
@@ -138,7 +142,7 @@ const LayoutPage = () => {
         rowLabel: seat.row,
         seatNumber: seat.number,
         type: seat.type,
-        // status: seat.status,
+
       }))
 
       const result = await addLayout(theaterId, { layout: layoutData })
@@ -193,7 +197,6 @@ const LayoutPage = () => {
                           color: seat.type === "PREMIUM" ? "#000" : "#fff",
                           fontSize: "12px",
                           cursor: "pointer",
-                          opacity: seat.type === "DISABLED" ? 0.5 : 1,
                         }}
                         onClick={() => toggleSeatType(seat.id)}
                         title={`${seat.row}${seat.number} - ${SEAT_TYPES[seat.type].label}`}
@@ -213,7 +216,7 @@ const LayoutPage = () => {
   }
 
   const getSeatCounts = () => {
-    const counts = { EXECUTIVE: 0, PREMIUM: 0, VIP: 0, DISABLED: 0 }
+    const counts = { EXECUTIVE: 0, PREMIUM: 0, VIP: 0 }
     seats.forEach((seat) => {
       counts[seat.type]++
     })
@@ -236,9 +239,9 @@ const LayoutPage = () => {
     <Container>
       <Row className="mb-4">
         <Col>
-          <h1 >Configure Seat Layout - {theater?.name}</h1>
+          <h1 >Configure Seat Layout - {theater?.theaterName}</h1>
           <p className="text-muted">
-            {theater?.address}, {theater?.city}
+            {theater?.theaterAddress}
           </p>
           <Alert variant="info" className="mb-3">
             <strong>Note</strong> This layout defines seat types and positions.
@@ -289,7 +292,6 @@ const LayoutPage = () => {
                     Premium: {seatCounts.PREMIUM}
                   </Badge>
                   <Badge bg="danger">VIP: {seatCounts.VIP}</Badge>
-                  <Badge bg="secondary">Disabled: {seatCounts.DISABLED}</Badge>
                 </div>
                 <small className="text-muted">Total: {seats.length} seats</small>
               </div>
@@ -320,13 +322,12 @@ const LayoutPage = () => {
                         width: "25px",
                         height: "25px",
                         backgroundColor: config.color,
-                        opacity: type === "DISABLED" ? 0.5 : 1,
                       }}
                     ></div>
                     <div>
                       <div className="fw-bold">{config.label}</div>
                       <small className="text-muted">
-                        {type === "DISABLED" ? "Not available for booking" : "Pricing set per show"}
+                        pricing set per show
                       </small>
                     </div>
                   </div>
@@ -334,8 +335,7 @@ const LayoutPage = () => {
               </div>
               <hr />
               <small className="text-muted">
-                <strong>Instructions:</strong> Click on any seat to cycle through types: Executive → Premium → VIP →
-                Disabled
+                <strong>Instructions:</strong> Click on any seat to cycle through types: Executive → Premium → VIP 
               </small>
             </Card.Body>
           </Card>

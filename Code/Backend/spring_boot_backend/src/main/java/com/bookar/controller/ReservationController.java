@@ -5,6 +5,7 @@ import com.bookar.dto.ReservationResponseDTO;
 import com.bookar.dto.SeatReservationResp;
 import com.bookar.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,5 +37,11 @@ public class ReservationController {
 	    reservationService.expireOldReservations();
 	    return ResponseEntity.noContent().build();
 	}
+	
+	@PostMapping("/reserve")
+    public ResponseEntity<SeatReservationResp> reserveSeats( @RequestBody ReservationRequestDTO req) {
+        SeatReservationResp res = reservationService.reserveSeats(req);
+        return ResponseEntity.status(HttpStatus.CREATED).body(res);
+    }
 
 }

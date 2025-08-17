@@ -10,15 +10,15 @@ const ShowSelectionPage = () => {
   const navigate = useNavigate();
 
   const [movie, setMovie] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
+  const [selectedDate, setSelectedDate] = useState(new Date().toLocaleDateString("en-CA"));
   const [selectedLocation, setSelectedLocation] = useState("");
   const [locations, setLocations] = useState([]);
   const [theaters, setTheaters] = useState([]);
 
   const dates = Array.from({ length: 7 }, (_, i) => {
-    const date = new Date();
-    date.setDate(date.getDate() + i);
-    return date.toISOString().split("T")[0];
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    return d.toLocaleDateString("en-CA"); 
   });
 
   useEffect(() => {
@@ -59,6 +59,15 @@ const ShowSelectionPage = () => {
       </Container>
     );
   }
+
+  const formatLocalDate = (yyyyMmDd) => {
+    if (!yyyyMmDd) return "";
+    return new Date(`${yyyyMmDd}T00:00:00`).toLocaleDateString(undefined, {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
+  };
 
   return (
     <Container className="py-4">
@@ -107,13 +116,9 @@ const ShowSelectionPage = () => {
               Select Date
             </Form.Label>
             <Form.Select value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)}>
-              {dates.map((date) => (
+            {dates.map((date) => (
                 <option key={date} value={date}>
-                  {new Date(date).toLocaleDateString("en-US", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                  })}
+                  {formatLocalDate(date)}
                 </option>
               ))}
             </Form.Select>
@@ -140,25 +145,34 @@ const ShowSelectionPage = () => {
 
                   <Col md={8}>
                     <div className="d-flex flex-wrap gap-2">
-                      {theater.shows.map((show) => (
-                        <Button
-                          key={show.showId}
-                          variant={!show.isAvailable ? "outline-primary" : "outline-secondary"}
-                          size="sm"
-                          disabled={show.isAvailable}
-                          onClick={() => handleShowSelect(theater.theaterId, show.showId)}
-                          className="d-flex flex-column align-items-center p-2"
-                          style={{ minWidth: "80px" }}
-                        >
-                          <div className="d-flex align-items-center mb-1">
-                            <Clock size={14} className="me-1" />
-                            <small className="fw-semibold text-success" style={{ fontSize: "1rem" }}>
-                              {show.startTime}
-                            </small>
-                          </div>
-                          {show.isAvailable && <small className="text-danger">Sold Out</small>}
-                        </Button>
-                      ))}
+                      {theater.shows.map((show) => {
+                       const startLocal = new Date(`${selectedDate}T${show.startTime}:00`);
+                       const localStartTime = startLocal.toLocaleTimeString("en-US", {
+                         hour: "2-digit",
+                         minute: "2-digit",
+                         hour12: true,
+                       });
+
+                        return (
+                          <Button
+                            key={show.showId}
+                            variant={show.showStatus === "SCHEDULED" ? "outline-primary" : "outline-secondary"}
+                            size="sm"
+                            disabled={show.showStatus === "ACTIVE" || show.showStatus === "EXPIRED"}
+                            onClick={() => handleShowSelect(theater.theaterId, show.showId)}
+                            className="d-flex flex-column align-items-center p-2"
+                            style={{ minWidth: "80px" }}
+                          >
+                            <div className="d-flex align-items-center mb-1">
+                              <Clock size={14} className="me-1" />
+                              <small className="fw-semibold text-success" style={{ fontSize: "1rem" }}>
+                                {localStartTime}
+                              </small>
+                            </div>
+                            {show.availableSeats == 0 && <small className="text-danger">Sold Out</small>}
+                          </Button>
+                        );
+                      })}
                     </div>
                   </Col>
                 </Row>
@@ -172,10 +186,10 @@ const ShowSelectionPage = () => {
                 <h5>No shows available</h5>
                 <p className="text-muted">
                   No shows found for {movie.title} in {selectedLocation} on{" "}
-                  {new Date(selectedDate).toLocaleDateString()}
+                  {new Date(`${selectedDate}T00:00:00`).toLocaleDateString()}
                 </p>
-                <Button variant="primary" onClick={() => navigate(`/movie/${id}`)}>
-                  Back to Movie Details
+                <Button variant="primary" onClick={() => navigate(`/`)}>
+                  Back to Home Page
                 </Button>
               </Card.Body>
             </Card>

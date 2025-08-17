@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { Container, Row, Col, Card, Button, Alert } from "react-bootstrap";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import { useBooking } from "../contexts/BookingContext";
 import SeatLayout from "../components/layout/SeatLayout";
 import "../styles/SeatLayout.css";
 
@@ -17,7 +16,8 @@ const SeatSelectionPage = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { selectedSeats, addToCart, removeFromCart } = useBooking();
+  const user = JSON.parse(sessionStorage.getItem("user"))
+  
 
   const theaterId = searchParams.get("theater");
   const showId = searchParams.get("show");
@@ -27,9 +27,21 @@ const SeatSelectionPage = () => {
   const [error, setError] = useState(null);
   const [movie, setMovie] = useState(null);
   const [showDetails, setShowDetails] = useState(null);
+  const [selectedSeats, setSelectedSeats] = useState([]);
+
 
   const [reservationId, setReservationId] = useState(null);
   const [reservationExpiresAt, setReservationExpiresAt] = useState(null);
+
+  const addToCart = (seat) => {
+    setSelectedSeats((prev) => [...prev, { ...seat, status: "selected" }]);
+  };
+
+  const removeFromCart = (seatId) => {
+    setSelectedSeats((prev) => prev.filter((seat) => seat.id !== seatId));
+  };
+
+  
 
   useEffect(() => {
     const loadMovie = async () => {
@@ -114,12 +126,15 @@ const SeatSelectionPage = () => {
   const handleProceedToPayment = async () => {
     const totalAmount = selectedSeats.reduce((sum, seat) => sum + seat.price, 0);
     const selectedSeatCount = selectedSeats.length;
+  
     if (selectedSeatCount === 0) return;
 
     try {
+      console.log(user)
+      console.log("id" + user.id)
       const payload = {
         showId: parseInt(showId),
-        userId: 1, // TODO: replace with actual user ID from auth context
+        userId: user.id, // TODO: replace with actual user ID from auth context
         showSeatIds: selectedSeats.map((s) => s.showSeatId),
         totalAmount,
       };
@@ -183,7 +198,8 @@ const SeatSelectionPage = () => {
               {showDetails ? (
                 <p className="text-muted mb-0">
                   {showDetails.theaterName} - {showDetails.theaterAddress} |{" "}
-                  {new Date(showDetails.showDate).toLocaleDateString()} @ {showDetails.startTime}
+                  {new Date(showDetails.showDate).toLocaleDateString()} | {" "} {showDetails.screenNumber}
+
                 </p>
               ) : (
                 <p className="text-muted mb-0">Loading show info...</p>

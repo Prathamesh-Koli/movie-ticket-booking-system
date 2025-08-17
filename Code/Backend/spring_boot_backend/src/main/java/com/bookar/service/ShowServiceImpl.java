@@ -5,13 +5,17 @@ import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.modelmapper.ModelMapper;
-import org.springframework.data.repository.query.Param;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,11 +56,32 @@ public class ShowServiceImpl implements ShowService {
     private ShowSeatDao showSeatDao;
     private ShowSeatTypePriceDao showSeatTypePriceDao;
 
+    
     @Override
     public List<TheaterShowDTO> getTheatersWithShows(Long movieId, LocalDate date, String location) {
         List<Show> shows = showDao.findShowsByMovieDateLocation(movieId, date, location);
+       
+        
+        LocalTime now = LocalTime.now();
+        
+        for (Show show : shows) {
+            LocalTime start = show.getStartTime();
+            LocalTime end = start.plusHours(3); 
 
-        Map<Theater, List<Show>> grouped = shows.stream()
+            if (now.isBefore(start)) {
+                show.setShowStatus(ShowStatus.SCHEDULED);
+            } else if (!now.isAfter(end)) {
+                show.setShowStatus(ShowStatus.ACTIVE);
+            } else {
+                show.setShowStatus(ShowStatus.EXPIRED);
+            }
+        }
+
+        List<Show> filteredShows = shows.stream()
+                .filter(s -> s.getShowStatus() == ShowStatus.SCHEDULED)
+                .toList();
+
+        Map<Theater, List<Show>> grouped = filteredShows.stream()
             .collect(Collectors.groupingBy(s -> s.getScreen().getTheater()));
 
         List<TheaterShowDTO> result = new ArrayList<>();
@@ -66,10 +91,16 @@ public class ShowServiceImpl implements ShowService {
             List<Show> theaterShows = entry.getValue();
 
             String screenName = theaterShows.get(0).getScreen().getScreenNumber();
+           
 
             List<ShowTimeDTO> showTimes = theaterShows.stream()
-                .map(s -> new ShowTimeDTO(s.getShowId(), s.getStartTime().toString()))
-                .toList();
+            		.map(s -> new ShowTimeDTO(
+            			    s.getShowId(),
+            			    s.getStartTime().toString(),
+            			    s.getShowStatus(),
+            			    showSeatDao.countByShowAndSeatStatusIn(s, Arrays.asList(SeatStatus.AVAILABLE, SeatStatus.RESERVED)))
+            			)
+                    .toList();
 
             result.add(new TheaterShowDTO(
                 theater.getTheaterId(),
@@ -80,6 +111,7 @@ public class ShowServiceImpl implements ShowService {
                 showTimes
             ));
         }
+
         return result;
     }
 
@@ -163,7 +195,10 @@ public class ShowServiceImpl implements ShowService {
 		  
 		  Movie movie = movieDao.findById(dto.getMovieId()).orElseThrow(()->new ResourceNotFoundException("Movie Not Found"));
 		  Screen screen = screenDao.findById(dto.getScreenId()).orElseThrow(()-> new ResourceNotFoundException("Screen Not Found"));
-
+		  
+		  if (!isScreenAvailable(dto.getScreenId(), dto.getShowDate(), dto.getShowTime())) {
+		        throw new IllegalStateException("Screen already booked for this time");
+		   }
 		 
 		  Show show = new Show();
 		  show.setMovie(movie);
@@ -191,7 +226,23 @@ public class ShowServiceImpl implements ShowService {
 		    ss.setSeatStatus(SeatStatus.AVAILABLE);
 		    showSeatDao.save(ss);
 		  }
-		}
+	}
+	
+	private boolean isScreenAvailable(Long screenId, LocalDate showDate, LocalTime showStartTime) {
+	    LocalDateTime showStart = LocalDateTime.of(showDate, showStartTime);
+	    LocalDateTime showEnd = showStart.plusHours(3); 
+
+	    List<Show> existingShows = showDao.findByScreen_ScreenIdAndShowDate(screenId, showDate);
+
+	    return existingShows.stream().noneMatch(s -> {
+	        LocalDateTime existingStart = LocalDateTime.of(s.getShowDate(), s.getStartTime());
+	        LocalDateTime existingEnd = existingStart.plusHours(3);
+	        return showStart.isBefore(existingEnd) && showEnd.isAfter(existingStart);
+	    });
+	}
+
+	
+	
 
 }
 

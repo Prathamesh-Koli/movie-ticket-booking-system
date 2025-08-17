@@ -72,14 +72,14 @@ const AddShowPage = () => {
       const enabled = prev.enabledSeatTypes.includes(type)
         ? prev.enabledSeatTypes.filter((t) => t !== type)
         : [...prev.enabledSeatTypes, type]
-  
+
       const updatedPrices = { ...prev.seatPrices }
       if (!enabled.includes(type)) {
         delete updatedPrices[type]
       } else if (!updatedPrices[type]) {
         updatedPrices[type] = 0
       }
-  
+
       return {
         ...prev,
         enabledSeatTypes: enabled,
@@ -87,7 +87,7 @@ const AddShowPage = () => {
       }
     })
   }
-  
+
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -96,11 +96,12 @@ const AddShowPage = () => {
 
     try {
 
-        if (formData.enabledSeatTypes.length === 0) {
-            setAlert({ type: "danger", message: "Please enable at least one seat type" })
-            setSaving(false)
-            return
-          }
+      if (formData.enabledSeatTypes.length === 0) {
+        setAlert({ type: "danger", message: "Please enable at least one seat type" })
+        setSaving(false)
+        return
+      }
+
 
       const showData = {
         movieId: Number.parseInt(formData.movieId),
@@ -179,7 +180,7 @@ const AddShowPage = () => {
                       <Form.Select name="screenId" value={formData.screenId || ""} onChange={handleChange} required>
                         {screenOptions.map(({ screenId, screenNumber }) => (
                           <option key={screenId} value={screenId}>
-                          {screenNumber}
+                            {screenNumber}
                           </option>
                         ))}
                       </Form.Select>
@@ -196,7 +197,7 @@ const AddShowPage = () => {
                         name="showDate"
                         value={formData.showDate}
                         onChange={handleChange}
-                        min={new Date().toISOString().split("T")[0]}
+                        min={new Date().toLocaleDateString('en-CA')}
                         required
                       />
                     </Form.Group>
@@ -209,73 +210,78 @@ const AddShowPage = () => {
                         name="showTime"
                         value={formData.showTime}
                         onChange={handleChange}
+                        min={
+                          formData.showDate === new Date().toLocaleDateString("en-CA")
+                            ? new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
+                            : "00:00"
+                        }
                         required
                       />
                     </Form.Group>
                   </Col>
                 </Row>
 
-              
 
 
-<Card className="mb-4">
-  <Card.Header>
-    <h5 className="mb-0">Seat Pricing Configuration</h5>
-    <small className="text-muted">Choose seat types and set custom prices</small>
-  </Card.Header>
-  <Card.Body>
-   
-    <div className="mb-3">
-      <Form.Label>Enable Seat Types:</Form.Label>
-      <div className="d-flex gap-3 flex-wrap">
-        {seatTypes.map((seatType) => (
-          <Form.Check
-            key={seatType.key}
-            type="checkbox"
-            id={`checkbox-${seatType.key}`}
-            label={`${seatType.icon} ${seatType.label}`}
-            checked={formData.enabledSeatTypes.includes(seatType.key)}
-            onChange={() => handleSeatTypeToggle(seatType.key)}
-          />
-        ))}
-      </div>
-    </div>
 
-    
-    <Row>
-      {formData.enabledSeatTypes.map((seatTypeKey) => {
-        const seatType = seatTypes.find((st) => st.key === seatTypeKey)
-        return (
-          <Col md={4} key={seatTypeKey} className="mb-3">
-            <Form.Group>
-              <Form.Label className="d-flex align-items-center gap-2">
-                <span style={{ fontSize: "18px" }}>{seatType.icon}</span>
-                <span>{seatType.label} Seats</span>
-              </Form.Label>
-              <InputGroup>
-                <InputGroup.Text>₹</InputGroup.Text>
-                <Form.Control
-                  type="number"
-                  min="0"
-                  step="10"
-                  value={formData.seatPrices[seatType.key] || ""}
-                  onChange={(e) => handlePriceChange(seatType.key, e.target.value)}
-                  placeholder="0"
-                  required
-                />
-              </InputGroup>
-              <Form.Text className="text-muted">Price per {seatType.label.toLowerCase()} seat</Form.Text>
-            </Form.Group>
-          </Col>
-        )
-      })}
-    </Row>
+                <Card className="mb-4">
+                  <Card.Header>
+                    <h5 className="mb-0">Seat Pricing Configuration</h5>
+                    <small className="text-muted">Choose seat types and set custom prices</small>
+                  </Card.Header>
+                  <Card.Body>
 
-    {formData.enabledSeatTypes.length === 0 && (
-      <div className="text-danger mt-2">At least one seat type must be enabled.</div>
-    )}
-  </Card.Body>
-</Card>
+                    <div className="mb-3">
+                      <Form.Label>Enable Seat Types:</Form.Label>
+                      <div className="d-flex gap-3 flex-wrap">
+                        {seatTypes.map((seatType) => (
+                          <Form.Check
+                            key={seatType.key}
+                            type="checkbox"
+                            id={`checkbox-${seatType.key}`}
+                            label={`${seatType.icon} ${seatType.label}`}
+                            checked={formData.enabledSeatTypes.includes(seatType.key)}
+                            onChange={() => handleSeatTypeToggle(seatType.key)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+
+                    <Row>
+                      {formData.enabledSeatTypes.map((seatTypeKey) => {
+                        const seatType = seatTypes.find((st) => st.key === seatTypeKey)
+                        return (
+                          <Col md={4} key={seatTypeKey} className="mb-3">
+                            <Form.Group>
+                              <Form.Label className="d-flex align-items-center gap-2">
+                                <span style={{ fontSize: "18px" }}>{seatType.icon}</span>
+                                <span>{seatType.label} Seats</span>
+                              </Form.Label>
+                              <InputGroup>
+                                <InputGroup.Text>₹</InputGroup.Text>
+                                <Form.Control
+                                  type="number"
+                                  min="0"
+                                  step="10"
+                                  value={formData.seatPrices[seatType.key] || ""}
+                                  onChange={(e) => handlePriceChange(seatType.key, e.target.value)}
+                                  placeholder="0"
+                                  required
+                                />
+                              </InputGroup>
+                              <Form.Text className="text-muted">Price per {seatType.label.toLowerCase()} seat</Form.Text>
+                            </Form.Group>
+                          </Col>
+                        )
+                      })}
+                    </Row>
+
+                    {formData.enabledSeatTypes.length === 0 && (
+                      <div className="text-danger mt-2">At least one seat type must be enabled.</div>
+                    )}
+                  </Card.Body>
+                </Card>
 
 
                 <div className="d-grid gap-2">
@@ -286,8 +292,8 @@ const AddShowPage = () => {
                         Scheduling Show...
                       </>
                     ) : (
-                      "Schedule Show with Custom Pricing"
-                    )}
+                        "Schedule Show with Custom Pricing"
+                      )}
                   </Button>
                   <Button variant="secondary" onClick={() => navigate("/owner/theaters")} disabled={saving}>
                     Cancel

@@ -69,6 +69,7 @@ export const fetchDashboardStats = async () => {
   }
 }
 
+
 export const fetchMoviesForShows = async () => {
   const { data } = await axios.get(`${BASE}/user/movies/shows`);
   return data;

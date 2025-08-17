@@ -5,7 +5,11 @@ package com.bookar.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +37,7 @@ import com.bookar.entities.SeatType;
 import com.bookar.entities.Show;
 import com.bookar.entities.ShowSeat;
 import com.bookar.entities.ShowSeatTypePrice;
+import com.bookar.entities.ShowStatus;
 import com.bookar.entities.User;
 
 import lombok.AllArgsConstructor;
@@ -49,43 +54,34 @@ public class ReservationServiceImpl implements ReservationService {
     private final ReservationSeatDao reservationSeatDao;
     private final CustomerDao customerDao;
     private final ShowSeatTypePriceDao priceDao;
+    private final ShowValidator showValidator;
 
     @Override
     public SeatReservationResp reserveSeats(ReservationRequestDTO req) {
     	
         Show show = showDao.findById(req.getShowId())
             .orElseThrow(() -> new ResourceNotFoundException("Show not found: " + req.getShowId()));
+        showValidator.validateShowSchedulable(show);
+     
         User user = customerDao.findById(req.getUserId())
-            .orElseThrow(() -> new ResourceNotFoundException("User not found: " + req.getUserId()));
-        List<ShowSeatTypePrice> showSeatPrices = priceDao.findByShow(show);
-        
-        Map<SeatType, Double> seatPriceMap = new HashMap<>();
-        for (ShowSeatTypePrice s : showSeatPrices) {
-            seatPriceMap.put(s.getSeatType(), s.getPrice());
-        }
-        
-        BigDecimal ticketAmount = BigDecimal.ZERO;
-        System.out.println();
+            .orElseThrow(() -> new ResourceNotFoundException("User not found: " + req.getUserId()));        
       
         List<ShowSeat> selectedSeats = new ArrayList<>();
-        for (Long seatId : req.getShowSeatIds()) {
-            ShowSeat ss = showSeatDao.findById(seatId)
-                .orElseThrow(() -> new ResourceNotFoundException("Seat not found: " + seatId));
+        List<Long> sortedSeatIds = new ArrayList<>(req.getShowSeatIds());
+        Collections.sort(sortedSeatIds);
+        for (Long seatId : sortedSeatIds) {
+        	ShowSeat ss = showSeatDao.findByIdForUpdate(seatId)
+        	        .orElseThrow(() -> new ResourceNotFoundException("Seat not found: " + seatId));
             if (ss.getSeatStatus() != SeatStatus.AVAILABLE) {
                 throw new IllegalStateException("Seat already reserved/booked: " + seatId);
             }
             ss.setSeatStatus(SeatStatus.RESERVED);
             showSeatDao.save(ss);
             selectedSeats.add(ss);
-            SeatType seatType = ss.getSeat().getType();
-            ticketAmount = ticketAmount.add(BigDecimal.valueOf(seatPriceMap.get(seatType)));
         }
         
-        
+       
         BigDecimal total = req.getTotalAmount();
-        		System.out.println(total);
-
-        
         Reservation reservation = new Reservation();
         reservation.setShow(show);
         reservation.setUser(user);
@@ -102,8 +98,6 @@ public class ReservationServiceImpl implements ReservationService {
             rs.setShowSeat(ss);
             reservationSeatDao.save(rs);
         }
-        
-        
         
         
         SeatReservationResp dto = new SeatReservationResp();

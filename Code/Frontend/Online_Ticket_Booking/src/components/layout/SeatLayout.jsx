@@ -4,7 +4,7 @@ import { useMemo } from "react"
 import PropTypes from "prop-types"
 import "../../styles/SeatLayout.css"
 
-const SeatLayout = ({ seats, onSeatClick, selectedSeats }) => {
+const SeatLayout = ({ seats, onSeatClick}) => {
   
   const layoutByType = useMemo(() => {
     const flat = seats.flat()
@@ -27,68 +27,35 @@ const SeatLayout = ({ seats, onSeatClick, selectedSeats }) => {
     return byType
   }, [seats])
 
-  // Detect consecutive blocks/gaps
-  const getSections = (rowSeats) => {
-    const sections = []
-    let start = rowSeats[0].number
-    let prev = start
-
-    for (let i = 1; i < rowSeats.length; i++) {
-      const num = rowSeats[i].number
-      if (num === prev + 1) {
-        prev = num
-      } else {
-        sections.push({ startSeat: start, endSeat: prev, gap: true })
-        start = num
-        prev = num
-      }
-    }
-    sections.push({ startSeat: start, endSeat: prev, gap: false })
-    return sections
-  }
-
   const renderSeatSection = (rowSeats) => {
-    const sections = getSections(rowSeats)
-
     return (
       <div className="seat-row-sections">
-        {sections.map((sec, idx) => (
-          <div key={idx} className="seat-section">
-            <div className="seats-group">
-              {Array.from({ length: sec.endSeat - sec.startSeat + 1 }, (_, i) => {
-                const num = sec.startSeat + i
-                const seat = rowSeats.find((s) => s.number === num)
-                if (!seat) {
-                  return (
-                    <div key={num} className="seat-placeholder">
-                      <span className="seat-number-placeholder">{num}</span>
-                    </div>
-                  )
-                }
-                const { id, status, price, type } = seat
-                return (
-                  <button
-                    key={id}
-                    className={`cinema-seat ${status}`}  // supports reserved
-                    onClick={() => onSeatClick(seat)}
-                    disabled={
-                      status === "booked" ||
-                      status === "unavailable" ||
-                      status === "reserved"
-                    }
-                    title={`${seat.row}${seat.number} - ₹${price} (${type})`}
-                  >
-                    <span className="seat-number">{seat.number}</span>
-                  </button>
-                )
-              })}
-            </div>
-            {sec.gap && <div className="aisle-gap"></div>}
+        <div className="seat-section">
+          <div className="seats-group">
+            {rowSeats.map((seat) => {
+              const { id, status, price, type, number } = seat
+              return (
+                <button
+                  key={id}
+                  className={`cinema-seat ${status}`} // supports reserved
+                  onClick={() => onSeatClick(seat)}
+                  disabled={
+                    status === "booked" ||
+                    status === "unavailable" ||
+                    status === "reserved"
+                  }
+                  title={`${seat.row}${seat.number} - ₹${price} (${type})`}
+                >
+                  <span className="seat-number">{number}</span>
+                </button>
+              )
+            })}
           </div>
-        ))}
+        </div>
       </div>
     )
   }
+  
 
   const renderTier = (tierName, rowsObj) => {
     const sampleRow = rowsObj[Object.keys(rowsObj)[0]] || []
@@ -160,7 +127,6 @@ const SeatLayout = ({ seats, onSeatClick, selectedSeats }) => {
 SeatLayout.propTypes = {
   seats: PropTypes.array.isRequired,
   onSeatClick: PropTypes.func.isRequired,
-  selectedSeats: PropTypes.array,
 }
 
 export default SeatLayout

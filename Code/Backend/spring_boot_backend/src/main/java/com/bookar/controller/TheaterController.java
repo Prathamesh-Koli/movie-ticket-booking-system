@@ -89,7 +89,7 @@ public class TheaterController {
         return ResponseEntity.ok(theaterService.getTheaterDetails(id));
     }
 
-    // Get Theater info (simple version)
+    // Get Theater info 
     @GetMapping("/{id}")
     public ResponseEntity<TheaterInfoDTO> getTheaterById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(theaterService.getTheaterById(id));
@@ -111,4 +111,5 @@ public class TheaterController {
         List<SeatLayoutResponseDTO> layout = theaterService.getSavedLayout(theaterId);
         return ResponseEntity.ok(layout);
     }
+    
 }

@@ -2,6 +2,8 @@ package com.bookar.dto;
 
 import java.time.LocalTime;
 
+import com.bookar.entities.ShowStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,5 +14,6 @@ import lombok.Setter;
 public class ShowTimeDTO {
 	private Long showId;
 	private String startTime;
-
+	private ShowStatus showStatus;
+	private int availableSeats;
 }
