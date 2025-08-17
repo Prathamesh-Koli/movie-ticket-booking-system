@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { loginUser } from '../services/user'
+import { loginUser, fetchUserDetails } from '../services/user'
 import { Container, Card, Form, Button } from 'react-bootstrap'
-
+// import jwt_decode from "jwt-decode";
 
 function Login() {
   const [info, setInfo] = useState({
@@ -12,9 +12,9 @@ function Login() {
   })
 
   const navigate = useNavigate()
-
-  const onLogin = async () => {
+  const handleLogin = async (e) => {
     const { email, password } = info
+<<<<<<< Updated upstream
     if (email.length === 0) toast.warn('Please enter Email!')
     else if (password.length === 0) toast.warn('Please enter Password!')
     else {
@@ -26,9 +26,34 @@ function Login() {
         navigate('/profile')
       } else {
         toast.error(`Error: ${response.data.msg}`)
+=======
+    e.preventDefault();
+    try {
+      // 1️⃣ Authenticate & get token
+      const response = await loginUser( email, password ); 
+      const token = response.data;
+      localStorage.setItem("token", token);
+      const userData = await fetchUserDetails()
+      console.log(userData)
+
+      // 3️⃣ Redirect based on role
+      switch (userData.role) {
+        case "ROLE_ADMIN":
+          navigate("/admin", { replace: true });
+          break;
+        case "ROLE_THEATRE_OWNER":
+          navigate("/dashboard", { replace: true });
+          break;
+        case "ROLE_CUSTOMER":
+        default:
+          navigate("/", { replace: true });
+>>>>>>> Stashed changes
       }
+    } catch (err) {
+      console.error(err);
+      toast.error("Invalid credentials");
     }
-  }
+  };
 
   return (
     <Container className='d-flex align-items-center justify-content-center' style={{ minHeight: '100vh' }}>
@@ -61,7 +86,7 @@ function Login() {
             <Link to='/signup'>Register</Link>
           </div>
 
-          <Button variant='primary' onClick={onLogin} className='w-100'>
+          <Button variant='primary' onClick={handleLogin} className='w-100'>
             Login
           </Button>
         </Form>

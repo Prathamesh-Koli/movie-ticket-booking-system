@@ -23,7 +23,12 @@ export const fetchOwnerShows = async (ownerId) => {
 // Delete a show by ID
 export const deleteShow = async (showId) => {
   try {
-    const response = await axios.delete(`${BASE}/user/${showId}`)
+    const token = localStorage.getItem("token")
+    const response = await axios.delete(`${BASE}/user/${showId}`,{
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
     return { success: true, message: response.data }
   } catch (error) {
     console.error("Error deleting show:", error)
@@ -34,8 +39,13 @@ export const deleteShow = async (showId) => {
 // Toggle show status (ACTIVE / SCHEDULED)
 export const toggleShowStatus = async (showId, newStatus) => {
   try {
+    const token = localStorage.getItem("token")
     const url = `${BASE}/user/${showId}/${newStatus === "ACTIVE" ? "activate" : "deactivate"}`
-    const response = await axios.put(url)
+    const response = await axios.put(url,null,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      })
     return { success: true, message: response.data }
   } catch (error) {
     console.error(`Error toggling show status:`, error)
@@ -60,6 +70,7 @@ export const fetchDashboardStats = async (ownerId) => {
 }
 
 export const fetchMoviesForShows = async () => {
+<<<<<<< Updated upstream
   const { data } = await axios.get(`${BASE}/movies/shows`);
    return data;
  };
@@ -94,3 +105,48 @@ export const fetchMoviesForShows = async () => {
        return data;
      };
    
+=======
+  const { data } = await axios.get(`${BASE}/user/movies/shows`);
+  return data;
+};
+
+export const fetchTheaterById = async (theaterId) => {
+  const { data } = await axios.get(`${BASE}/api/theaters/${theaterId}`);
+  return data;
+};
+
+export const fetchLayoutByTheaterId = async (theaterId) => {
+  const { data } = await axios.get(`${BASE}/api/theaters/${theaterId}/getlayout`);
+  return data;
+};
+
+
+export const addShow = async (theaterId, showData) => {
+  const payload = {
+    movieId: showData.movieId,
+    screenId: showData.screenId,
+    showDate: showData.showDate,
+    showTime: showData.showTime,
+    seatPrices: showData.seatPrices,
+  };
+  const token = localStorage.getItem("token")
+  const { data } = await axios.post(`${BASE}/shows/theaters/${theaterId}`, payload,{
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+  return data;
+};
+
+
+export const addLayout = async (theaterId, layoutRequestDTO) => {
+  const token = localStorage.getItem("token")
+  const { data } = await axios.post(`${BASE}/api/theaters/${theaterId}/savelayout`, layoutRequestDTO, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            }
+        });
+  return data;
+};
+
+>>>>>>> Stashed changes

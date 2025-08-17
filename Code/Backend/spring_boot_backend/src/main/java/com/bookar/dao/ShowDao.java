@@ -33,47 +33,122 @@ public interface ShowDao extends JpaRepository<Show, Long> {
 	ShowDetailsDTO getShowDetailsByShowId(@Param("showId") Long showId);
 
 	@Query(value = """
-		SELECT sh.show_id AS showId, m.title AS movieTitle, t.theater_name AS theaterName, s.screen_no AS screenNumber,
-            sh.show_date AS showDate, sh.start_time AS startTime, sh.show_status AS showStatus,
-            (SELECT COUNT(*) FROM seats seat WHERE seat.screen_id = s.screen_id) AS totalSeats,
-            (SELECT COUNT(*) FROM show_seats ss JOIN reservations r ON r.show_id = ss.show_id 
-             JOIN reservation_seats rs ON rs.show_seat_id = ss.show_seat_id
-             WHERE ss.show_id = sh.show_id AND ss.seat_status = 'BOOKED' AND r.reservation_status = 'CONFIRMED') AS bookedSeats,
-            (SELECT SUM(price) FROM show_seat_type_prices price JOIN show_seats ss ON price.show_id = ss.show_id
-             JOIN seats seat ON seat.seat_id = ss.seat_id JOIN reservation_seats rs ON rs.show_seat_id = ss.show_seat_id
-             JOIN reservations r ON r.reservation_id = rs.reservation_id WHERE ss.show_id = sh.show_id AND r.reservation_status = 'CONFIRMED'
-             AND seat.seat_type = price.seat_type) AS revenue FROM shows sh
-        JOIN movies m ON sh.movie_id = m.movie_id JOIN screens s ON s.screen_id = sh.screen_id JOIN theaters t ON t.theater_id = s.theater_id
-        WHERE sh.show_status IN ('ACTIVE', 'SCHEDULED') AND t.owner_id = :ownerId """, nativeQuery = true)
+					SELECT
+			    sh.show_id AS showId,
+			    m.title AS movieTitle,
+			    t.theater_name AS theaterName,
+			    sc.screen_no AS screenNumber,
+			    sh.show_date AS showDate,
+			    sh.start_time AS startTime,
+			    sh.show_status AS showStatus,
+			    (SELECT COUNT(*) FROM seats seat WHERE seat.screen_id = sc.screen_id) AS totalSeats,
+			    (SELECT COUNT(*) FROM show_seats ss
+			     JOIN reservation_seats rs ON rs.show_seat_id = ss.show_seat_id
+			     JOIN reservations r ON r.reservation_id = rs.reservation_id
+			     WHERE ss.show_id = sh.show_id
+			       AND ss.seat_status = 'BOOKED'
+			       AND r.reservation_status = 'CONFIRMED') AS bookedSeats,
+			    (SELECT COALESCE(SUM(sstp.price), 0)
+			     FROM show_seats ss2
+			     JOIN seats s2 ON ss2.seat_id = s2.seat_id
+			     JOIN reservation_seats rs2 ON rs2.show_seat_id = ss2.show_seat_id
+			     JOIN reservations r2 ON r2.reservation_id = rs2.reservation_id
+			     JOIN show_seat_type_prices sstp
+			          ON ss2.show_id = sstp.show_id
+			         AND s2.seat_type = sstp.seat_type
+			     WHERE ss2.show_id = sh.show_id
+			       AND r2.reservation_status = 'CONFIRMED') AS revenue,
+			    (SELECT COALESCE(SUM(sstp2.price), 0)
+			     FROM show_seats ss3
+			     JOIN seats s3 ON ss3.seat_id = s3.seat_id
+			     JOIN reservation_seats rs3 ON rs3.show_seat_id = ss3.show_seat_id
+			     JOIN reservations r3 ON r3.reservation_id = rs3.reservation_id
+			     JOIN show_seat_type_prices sstp2
+			          ON ss3.show_id = sstp2.show_id
+			         AND s3.seat_type = sstp2.seat_type
+			     WHERE ss3.show_id = sh.show_id
+			       AND r3.reservation_status = 'CONFIRMED'
+			       AND DATE(r3.reserved_at) = CURDATE()) AS todaysRevenue
+			FROM shows sh
+			JOIN movies m ON sh.movie_id = m.movie_id
+			JOIN screens sc ON sc.screen_id = sh.screen_id
+			JOIN theaters t ON t.theater_id = sc.theater_id
+			WHERE sh.show_status IN ('ACTIVE', 'SCHEDULED')
+			  AND t.owner_id = :ownerId
+
+					""", nativeQuery = true)
 	List<Object[]> findShowStatsByOwner(@Param("ownerId") Long ownerId);
 
 	@Query(value = """
 			SELECT
+			 -- Theaters count
+			 (SELECT COUNT(*)
+			  FROM theaters th
+			  WHERE th.owner_id = :ownerId AND th.status = 'PENDING') AS pendingTheaters,
 
-			(SELECT COUNT(*) FROM theaters WHERE owner_id = :ownerId AND status = 'PENDING') AS pendingTheaters,
+			 (SELECT COUNT(*)
+			  FROM theaters th
+			  WHERE th.owner_id = :ownerId AND th.status = 'APPROVED') AS approvedTheaters,
 
-			(SELECT COUNT(*) FROM theaters WHERE owner_id = :ownerId AND status = 'APPROVED') AS approvedTheaters,
+			 (SELECT COUNT(*)
+			  FROM theaters th
+			  WHERE th.owner_id = :ownerId) AS totalTheaters,
 
-			(SELECT COUNT(*) FROM theaters WHERE owner_id = :ownerId) AS totalTheaters,
+			 -- Active shows
+			 (SELECT COUNT(DISTINCT sh.show_id)
+			  FROM shows sh
+			  JOIN screens sc ON sh.screen_id = sc.screen_id
+			  JOIN theaters t ON sc.theater_id = t.theater_id
+			  WHERE t.owner_id = :ownerId AND sh.show_status = 'ACTIVE') AS activeShows,
 
-			(SELECT COUNT(DISTINCT sh.show_id) FROM shows sh JOIN screens sc ON sh.screen_id = sc.screen_id JOIN theaters t
-			ON sc.theater_id = t.theater_id WHERE t.owner_id = :ownerId AND sh.show_status = 'ACTIVE') AS activeShows,
+			 -- Scheduled shows
+			 (SELECT COUNT(DISTINCT sh.show_id)
+			  FROM shows sh
+			  JOIN screens sc ON sh.screen_id = sc.screen_id
+			  JOIN theaters t ON sc.theater_id = t.theater_id
+			  WHERE t.owner_id = :ownerId AND sh.show_status = 'SCHEDULED') AS scheduledShows,
 
-			(SELECT COUNT(DISTINCT sh.show_id) FROM shows sh JOIN screens sc ON sh.screen_id = sc.screen_id
-			 JOIN theaters t ON sc.theater_id = t.theater_id WHERE t.owner_id = :ownerId AND sh.show_status = 'SCHEDULED') AS scheduledShows,
+			 -- Total revenue (now only from show_seat_type_prices)
+			 (SELECT COALESCE(SUM(sstp.price), 0)
+			  FROM reservations r2
+			  JOIN reservation_seats rs2 ON r2.reservation_id = rs2.reservation_id
+			  JOIN show_seats ss2 ON rs2.show_seat_id = ss2.show_seat_id
+			  JOIN seats s ON ss2.seat_id = s.seat_id
+			  JOIN show_seat_type_prices sstp ON ss2.show_id = sstp.show_id
+			                                 AND s.seat_type = sstp.seat_type
+			  JOIN shows sh3 ON ss2.show_id = sh3.show_id
+			  JOIN screens sc3 ON sh3.screen_id = sc3.screen_id
+			  JOIN theaters t3 ON sc3.theater_id = t3.theater_id
+			  WHERE r2.reservation_status = 'CONFIRMED'
+			    AND t3.owner_id = :ownerId) AS totalRevenue,
 
-			(SELECT COUNT(DISTINCT r.reservation_id) FROM reservations r JOIN shows sh ON r.show_id = sh.show_id
-			 JOIN screens sc ON sh.screen_id = sc.screen_id JOIN theaters t ON sc.theater_id = t.theater_id
-			 WHERE t.owner_id = :ownerId AND DATE(r.reserved_at) = CURDATE() AND r.reservation_status = 'CONFIRMED') AS todaysBookings,
+			 -- Today's confirmed bookings
+			 (SELECT COUNT(DISTINCT r3.reservation_id)
+			  FROM reservations r3
+			  JOIN shows sh4 ON r3.show_id = sh4.show_id
+			  JOIN screens sc4 ON sh4.screen_id = sc4.screen_id
+			  JOIN theaters t4 ON sc4.theater_id = t4.theater_id
+			  WHERE DATE(r3.reserved_at) = CURDATE()
+			    AND r3.reservation_status = 'CONFIRMED'
+			    AND t4.owner_id = :ownerId) AS todaysBookings,
 
-			(SELECT COALESCE(SUM(COALESCE(sstp.price, s.seat_price)), 0) FROM reservations r
-			 JOIN reservation_seats rs ON r.reservation_id = rs.reservation_id
-			 JOIN show_seats ss ON rs.show_seat_id = ss.show_seat_id JOIN seats s ON ss.seat_id = s.seat_id
-			 JOIN shows sh ON ss.show_id = sh.show_id LEFT JOIN show_seat_type_prices sstp ON sh.show_id = sstp.show_id AND s.seat_type = sstp.seat_type
-			 JOIN screens sc ON sh.screen_id = sc.screen_id JOIN theaters t ON sc.theater_id = t.theater_id
-			 WHERE t.owner_id = :ownerId AND DATE(r.reserved_at) = CURDATE() AND r.reservation_status = 'CONFIRMED') AS todaysRevenue;
-			  		""", nativeQuery = true)
-	TheatreDashboardDTO getOwnerDashboardStats(@Param("ownerId") Long ownerId);
+			 -- Today's revenue
+			 (SELECT COALESCE(SUM(sstp2.price), 0)
+			  FROM reservations r4
+			  JOIN reservation_seats rs4 ON r4.reservation_id = rs4.reservation_id
+			  JOIN show_seats ss4 ON rs4.show_seat_id = ss4.show_seat_id
+			  JOIN seats s2 ON ss4.seat_id = s2.seat_id
+			  JOIN show_seat_type_prices sstp2 ON ss4.show_id = sstp2.show_id
+			                                  AND s2.seat_type = sstp2.seat_type
+			  JOIN shows sh5 ON ss4.show_id = sh5.show_id
+			  JOIN screens sc5 ON sh5.screen_id = sc5.screen_id
+			  JOIN theaters t5 ON sc5.theater_id = t5.theater_id
+			  WHERE DATE(r4.reserved_at) = CURDATE()
+			    AND r4.reservation_status = 'CONFIRMED'
+			    AND t5.owner_id = :ownerId) AS todaysRevenue;
+
+			""", nativeQuery = true)
+	Object getOwnerDashboardStats(@Param("ownerId") Long ownerId);
 
 	@Modifying
 	@Query("UPDATE Show s SET s.showStatus = 'EXPIRED' WHERE s.showDate < CURRENT_DATE AND s.showStatus != 'EXPIRED'")

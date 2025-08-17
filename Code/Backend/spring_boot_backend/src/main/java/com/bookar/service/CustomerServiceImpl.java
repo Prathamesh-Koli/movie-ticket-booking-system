@@ -93,6 +93,7 @@ public class CustomerServiceImpl implements CustomerService
 	@Override
 	public UserResponseDTO getDetailsById(Long id) {
 		User user = custDao.findById(id).orElseThrow(() -> new ApiException("User Not Found..!"));
+		System.out.println(user);
 		return mapper.map(user, UserResponseDTO.class);
 	}
 
@@ -108,5 +109,49 @@ public class CustomerServiceImpl implements CustomerService
 		}
 		throw new InvalidCredentialsException("The current password you entered is incorrect. Please try again !!!");
 	}
+	
+	
+	public List<BookingResponseDTO> getBookingsForUser(Long userId) {
+        List<Object[]> rows = custDao.findBookingsByUserId(userId);
+
+        List<BookingDetailsDTO> flatList = rows.stream().map(row -> {
+            BookingDetailsDTO dto = new BookingDetailsDTO();
+            dto.setBookingId(((Number) row[0]).longValue());
+            dto.setReservationId(((Number)row[1]).longValue());
+            dto.setMovieTitle((String) row[2]);
+            dto.setTheaterName((String) row[3]);
+            dto.setScreenNumber(String.valueOf(row[4]));
+            dto.setBookingDate(((java.sql.Timestamp) row[5]).toLocalDateTime().toLocalDate());
+            dto.setShowTime(((java.sql.Time) row[6]).toLocalTime());
+            dto.setSeatId(((Number) row[7]).longValue());
+            dto.setRowLabel((String) row[8]);
+            dto.setSeatNumber(((Number) row[9]).intValue());
+            dto.setTotalAmount(((Number) row[10]).doubleValue());
+            dto.setStatus(((String) row[11]).toLowerCase());
+            return dto;
+           
+        }).collect(Collectors.toList());
+
+        // Group by bookingId
+        Map<Long, BookingResponseDTO> grouped = new LinkedHashMap<>();
+        for (BookingDetailsDTO dto : flatList) {
+            grouped.computeIfAbsent(dto.getBookingId(), id -> {
+                BookingResponseDTO resp = new BookingResponseDTO();
+                resp.setId(dto.getBookingId());
+                resp.setReservationId(dto.getReservationId());
+                resp.setMovieTitle(dto.getMovieTitle());
+                resp.setTheaterName(dto.getTheaterName());
+                resp.setScreenNumber(dto.getScreenNumber());
+                resp.setBookingDate(dto.getBookingDate());
+                resp.setShowTime(dto.getShowTime());
+                resp.setTotalAmount(dto.getTotalAmount());
+                resp.setStatus(dto.getStatus());
+                resp.setSeats(new ArrayList<>());
+                return resp;
+            }).getSeats().add(new SeatDTO(dto.getSeatId(), dto.getRowLabel(), dto.getSeatNumber()));
+        }
+
+        return new ArrayList<>(grouped.values());
+    }
 
 }
